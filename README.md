@@ -1,1 +1,1 @@
-
+npm i jsonwebtoken bcrypt body-parser dotenv joi cors
