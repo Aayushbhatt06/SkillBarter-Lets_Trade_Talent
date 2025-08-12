@@ -2,114 +2,91 @@ const UserModel = require("../Models/User");
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
-const signup = async (req,res)=>{
-    try{
-        const {name , email , password} = req.body;
-        const user = await UserModel.findOne({email})
-        if(user){
+const signup = async (req, res) => {
+    try {
+        const { name, email, password } = req.body;
+
+        const user = await UserModel.findOne({ email });
+        if (user) {
             return res.status(409).json({
-            message: "User Already Exists, Please Login",
-            success:false
-        });
+                message: "User Already Exists, Please Login",
+                success: false
+            });
         }
-        const userModel = new UserModel({name,email,password});
-        userModel.password = await bcrypt.hash(password,10);
-        await userModel.save();
+
+        const hashedPassword = await bcrypt.hash(password, 10);
+        const userModel = new UserModel({ name, email, password: hashedPassword });
+
+        const savedUser = await userModel.save();
+
         res.status(201).json({
             message: "Signup Successful",
-            success:true
+            success: true,
+            data: {
+                _id: savedUser._id,
+                name: savedUser.name,
+                skills: savedUser.skills,
+                email: savedUser.email,
+                createdAt: savedUser.createdAt
+            }
         });
-    }catch(err){
+    } catch (err) {
+        console.error(err);
         res.status(500).json({
             message: "Server side error",
-            success:false
+            success: false
         });
     }
 }
 
-const login = async (req,res)=>{
-    try{
-        const {email , password} = req.body;
-        const user = await UserModel.findOne({email})
-        if(!user){
+const login = async (req, res) => {
+    try {
+        const { email, password } = req.body;
+        const user = await UserModel.findOne({ email });
+
+        if (!user) {
             return res.status(403).json({
-            message: "Auth email or password is worng",
-            success:false
-        });
+                message: "Auth email or password is wrong",
+                success: false
+            });
         }
-        const isPasswordEqual = await bcrypt.compare(password,user.password)
-        if(!isPasswordEqual){
+
+        const isPasswordEqual = await bcrypt.compare(password, user.password);
+        if (!isPasswordEqual) {
             return res.status(403).json({
-            message: "Auth email or password is worng",
-            success:false
-        });
+                message: "Auth email or password is wrong",
+                success: false
+            });
         }
 
         const jwtToken = jwt.sign(
-            {email:user.email,_id : user._id},
-            "SECRET-123",
-            {expiresIn:'24h'}
-        )
+            { email: user.email, _id: user._id },
+            "SECRET-123", // Use process.env.JWT_SECRET in production
+            { expiresIn: '24h' }
+        );
+
         res.status(200).json({
             message: "Login Successful",
-            success:true,
+            success: true,
             jwtToken,
-            email,
-            name:user.name
+            data: {
+                _id: user._id,
+                name: user.name,
+                email: user.email,
+                createdAt: user.createdAt
+            }
         });
-    }catch(err){
+
+    } catch (err) {
+        console.error(err);
         res.status(500).json({
             message: "Server side error",
-            success:false
+            success: false
         });
     }
 }
 
-
-// const login = async (req, res) => {
-//     try {
-//         const { email, password } = req.body;
-
-//         const user = await UserModel.findOne({ email });
-//         if (!user) {
-//             return res.status(403).json({
-//                 message: "Auth email or password is wrong",
-//                 success: false
-//             });
-//         }
-
-//         const isPasswordEqual = await bcrypt.compare(password, user.password);
-//         if (!isPasswordEqual) {
-//             return res.status(403).json({
-//                 message: "Auth email or password is wrong",
-//                 success: false
-//             });
-//         }
-
-//         const jwtToken = jwt.sign(
-//             { email: user.email, _id: user._id },
-//             "SECRET-123", // Ideally use process.env.JWT_SECRET
-//             { expiresIn: '24h' }
-//         );
-
-//         res.status(200).json({
-//             message: "Login Successful",
-//             success: true,
-//             jwtToken,
-//             email: user.email,
-//             name: user.name
-//         });
-
-//     } catch (err) {
-//         console.error(err); // Useful for debugging
-//         res.status(500).json({
-//             message: "Server side error",
-//             success: false
-//         });
-//     }
-// };
-
-module.exports={
+module.exports = {
     signup,
     login
-}
+};

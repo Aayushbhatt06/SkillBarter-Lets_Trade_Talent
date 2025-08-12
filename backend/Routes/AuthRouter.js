@@ -8,4 +8,4 @@ const { signup,login } = require('../Controllers/AuthController')
 router.post('/signup',signupValidation,signup)
 router.post('/login',LoginValidation,login)
 
-module.exports = router;    
+module.exports = router;
