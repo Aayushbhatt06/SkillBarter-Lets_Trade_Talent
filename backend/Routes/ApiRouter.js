@@ -1,8 +1,8 @@
 const router = require('express').Router();
 const {addSkills,findUserSk} = require('../Controllers/addSkill.js');
-// const {verifyToken} = require('../Middlewares/')
+const LoggedInOnly = require('../Middlewares/LoggedInOnly.js')
 const addProject = require('../Controllers/addProject.js')
-router.post('/addskill',addSkills);
-router.post('/findskilled',findUserSk);
-router.post('/projects',addProject)
+router.post('/addskill',LoggedInOnly,addSkills);
+router.post('/findskilled',LoggedInOnly,findUserSk);
+router.post('/projects',LoggedInOnly,addProject)
 module.exports = router;

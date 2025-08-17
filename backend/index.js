@@ -5,11 +5,15 @@ const bodyParser = require('body-parser')
 const cors = require('cors')
 const AuthRouter = require('./Routes/AuthRouter')
 const ApiRouter = require('./Routes/ApiRouter')
+require('dotenv').config()
 
-const PORT = 8080;
+const PORT = process.env.PORT;
 
 app.get('/ping',(req,res)=>{
     res.send("PONG")
+})
+app.get('/',(req,res)=>{
+    res.send("Hello World!!!")
 })
 
 app.use(bodyParser.json());

@@ -3,7 +3,8 @@ const UserModel = require('../Models/User');
 
 const addProject = async (req, res) => {
     try {
-        const { name, requiredSkills, description, userId } = req.body;
+        const { name, requiredSkills, description } = req.body;
+        const userId = req.user._id;
 
         if (!name || !requiredSkills || !description || !userId) {
             return res.status(400).json({

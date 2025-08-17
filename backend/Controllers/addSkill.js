@@ -2,7 +2,8 @@ const UserModel = require("../Models/User");
 
 const addSkills = async (req, res) => {
     try {
-        const { email, skills } = req.body;
+        const { skills } = req.body;
+        const email = req.user.email;
 
         if (!email || !skills || !Array.isArray(skills) || skills.length === 0) {
             return res.status(400).json({
