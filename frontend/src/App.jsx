@@ -3,6 +3,7 @@ import Navbar from "./components/Navbar"
 import Signup from './components/Signup'
 import Home from './components/Home'
 import Login from './components/Login'
+import ProtectedRoute from './components/ProtectedRoute'
 
 // Layout with Navbar that wraps around all pages
 const Layout = () => {
@@ -21,7 +22,7 @@ const router = createBrowserRouter([
     children: [
       {
         path: "/",          // Home route
-        element: <h1><Home/></h1>
+        element: <h1><ProtectedRoute> <Home/></ProtectedRoute></h1>
       },
       {
         path: "signup",     // Signup route

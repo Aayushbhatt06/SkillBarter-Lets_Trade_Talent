@@ -22,7 +22,7 @@ const projectSchema = new mongoose.Schema({
   userId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',    // Reference to User collection
-    required: true
+    // required: true
   },
   createdAt: {
     type: Date, 
