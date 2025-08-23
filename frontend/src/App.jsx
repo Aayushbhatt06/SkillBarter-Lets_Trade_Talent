@@ -1,12 +1,12 @@
-// App.jsx
+import { useState } from "react";
 import { createBrowserRouter, RouterProvider, Outlet } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Signup from "./components/Signup";
 import Home from "./components/Home";
 import Login from "./components/Login";
 import ProtectedRoute from "./components/ProtectedRoute";
+import { ModeContext, modeClassContext, tagContext } from "../Context/context";
 
-// Layout with Navbar to wrap normal app pages
 const Layout = () => {
   return (
     <>
@@ -17,35 +17,37 @@ const Layout = () => {
 };
 
 const router = createBrowserRouter([
-  // Auth routes WITHOUT layout
-  {
-    path: "/login",
-    element: <Login />,
-  },
-  {
-    path: "/signup",
-    element: <Signup />,
-  },
+  { path: "/login", element: <Login /> },
+  { path: "/signup", element: <Signup /> },
 
-  // App routes WITH layout
   {
     path: "/",
-    element: <Layout />, // Navbar always visible for these children
+    element: <Layout />,
     children: [
       {
-        index: true, // same as path: ""
+        index: true,
         element: (
           <ProtectedRoute>
             <Home />
           </ProtectedRoute>
         ),
       },
-      // add more children that should show the Navbar
-      // { path: "dashboard", element: <ProtectedRoute><Dashboard /></ProtectedRoute> },
     ],
   },
 ]);
 
 export default function App() {
-  return <RouterProvider router={router} />;
+  const [mode, setMode] = useState(false);
+  const [dl, setDl] = useState("light");
+  
+
+  return (
+    <ModeContext.Provider value={{ mode, setMode }}>
+      <modeClassContext.Provider value={{ dl, setDl }}>
+        <tagContext.Provider>
+          <RouterProvider router={router} />
+        </tagContext.Provider>
+      </modeClassContext.Provider>
+    </ModeContext.Provider>
+  );
 }

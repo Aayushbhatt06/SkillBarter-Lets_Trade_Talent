@@ -7,8 +7,8 @@ const Login = () => {
     password: "",
   });
 
-  const [loading, setLoading] = useState(false); // CHANGED: loading state for button UX
-  const [errorMsg, setErrorMsg] = useState(""); // CHANGED: error message state
+  const [loading, setLoading] = useState(false); 
+  const [errorMsg, setErrorMsg] = useState(""); 
   const navigate = useNavigate();
 
   const handleOnChange = (e) => {
@@ -17,16 +17,14 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setErrorMsg(""); // CHANGED: clear before submit
-    setLoading(true); // CHANGED: set loading
+    setErrorMsg(""); 
+    setLoading(true); 
     try {
       const res = await fetch("http://localhost:8080/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
       });
-
-      // CHANGED: handle non-2xx responses explicitly
 
       const data = await res.json();
       console.log("Response:", data.message);
@@ -35,21 +33,21 @@ const Login = () => {
         localStorage.setItem("token", data.jwtToken);
         navigate("/");
       } else {
-        setErrorMsg(data.message || "Login failed"); // CHANGED: show server message
+        setErrorMsg(data.message || "Login failed"); 
       }
     } catch (err) {
       console.error("Error:", err);
-      setErrorMsg(err.message || "Something went wrong"); // CHANGED: catch errors
+      setErrorMsg(err.message || "Something went wrong"); 
     } finally {
-      setLoading(false); // CHANGED: stop loading
+      setLoading(false); 
     }
   };
 
   return (
     <>
-      {/* CHANGED: Professional gradient theme (slate/blue) */}
+      
       <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800 flex items-center justify-center px-6 py-12">
-        {/* Form card */}
+        
         <div
           className="
             w-full max-w-sm p-5 rounded-2xl
@@ -60,20 +58,12 @@ const Login = () => {
           "
         >
           <div className="sm:mx-auto sm:w-full sm:max-w-sm">
-            {/* kept logo commented */}
-            {/* <img
-              src="..."
-              alt="Your Company"
-              className="mx-auto h-10 w-auto"
-            /> */}
             <h2 className="mt-2 text-center text-2xl font-bold tracking-tight text-white">
-              {/* CHANGED: Heading to Login context */}
               Login
             </h2>
           </div>
 
           <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-sm">
-            {/* Integrated controlled form */}
             <form onSubmit={handleSubmit} className="space-y-6">
               <div>
                 <label
@@ -92,7 +82,7 @@ const Login = () => {
                     placeholder="Enter valid email"
                     required
                     autoComplete="email"
-                    className="block w-full rounded-md bg-white/5 px-3 py-1.5 text-base text-white outline-1 -outline-offset-1 outline-white/10 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-blue-400 sm:text-sm" /* CHANGED: focus blue */
+                    className="block w-full rounded-md bg-white/5 px-3 py-1.5 text-base text-white outline-1 -outline-offset-1 outline-white/10 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-blue-400 sm:text-sm" 
                   />
                 </div>
               </div>
@@ -107,7 +97,7 @@ const Login = () => {
                   </label>
                   <a
                     href="#"
-                    className="text-sm font-medium text-blue-300 hover:text-blue-200" /* CHANGED: optional forgot link styling */
+                    className="text-sm font-medium text-blue-300 hover:text-blue-200" 
                   >
                     Forgot password?
                   </a>
@@ -121,14 +111,14 @@ const Login = () => {
                     onChange={handleOnChange}
                     placeholder="Password"
                     required
-                    autoComplete="current-password" /* CHANGED: correct autoComplete for login */
-                    className="block w-full rounded-md bg-white/5 px-3 py-1.5 text-base text-white outline-1 -outline-offset-1 outline-white/10 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-blue-400 sm:text-sm" /* CHANGED: focus blue */
+                    autoComplete="current-password" 
+                    className="block w-full rounded-md bg-white/5 px-3 py-1.5 text-base text-white outline-1 -outline-offset-1 outline-white/10 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-blue-400 sm:text-sm" 
                   />
                 </div>
               </div>
 
               {errorMsg ? (
-                <p className="text-sm text-rose-200">{errorMsg}</p> // CHANGED: show errors
+                <p className="text-sm text-rose-200">{errorMsg}</p> 
               ) : null}
 
               <div>
@@ -144,17 +134,15 @@ const Login = () => {
                   "
                 >
                   {loading ? "Signing in..." : "Sign in"}{" "}
-                  {/* CHANGED: button label */}
                 </button>
               </div>
             </form>
 
             <p className="mt-8 text-center text-sm text-gray-200">
-              {/* CHANGED: footer to signup CTA */}
               New here?{" "}
               <a
                 href="/signup"
-                className="font-semibold text-blue-200 hover:text-blue-100" /* CHANGED: link color to blue */
+                className="font-semibold text-blue-200 hover:text-blue-100"
               >
                 Create an account
               </a>
