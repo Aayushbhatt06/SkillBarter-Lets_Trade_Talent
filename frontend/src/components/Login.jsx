@@ -1,63 +1,169 @@
-import React, { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const Login = () => {
   const [formData, setFormData] = useState({
     email: "",
-    password: ""
-  })
+    password: "",
+  });
 
-  const navigate = useNavigate()
+  const [loading, setLoading] = useState(false); // CHANGED: loading state for button UX
+  const [errorMsg, setErrorMsg] = useState(""); // CHANGED: error message state
+  const navigate = useNavigate();
 
   const handleOnChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value })
-  }
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
+    e.preventDefault();
+    setErrorMsg(""); // CHANGED: clear before submit
+    setLoading(true); // CHANGED: set loading
     try {
       const res = await fetch("http://localhost:8080/auth/login", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(formData)
-      })
-      const data = await res.json()
-      console.log("Response:", data)
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
 
-      if (data.success) {
+      // CHANGED: handle non-2xx responses explicitly
+
+      const data = await res.json();
+      console.log("Response:", data.message);
+
+      if (data?.success) {
         localStorage.setItem("token", data.jwtToken);
-        navigate("/")   // redirect after successful login
+        navigate("/");
+      } else {
+        setErrorMsg(data.message || "Login failed"); // CHANGED: show server message
       }
     } catch (err) {
-      console.error("Error:", err)
+      console.error("Error:", err);
+      setErrorMsg(err.message || "Something went wrong"); // CHANGED: catch errors
+    } finally {
+      setLoading(false); // CHANGED: stop loading
     }
-  }
+  };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <label htmlFor="email">Email</label>
-      <input 
-        type="email" 
-        name="email" 
-        onChange={handleOnChange} 
-        placeholder="Enter Valid Email" 
-        required
-      />
+    <>
+      {/* CHANGED: Professional gradient theme (slate/blue) */}
+      <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800 flex items-center justify-center px-6 py-12">
+        {/* Form card */}
+        <div
+          className="
+            w-full max-w-sm p-5 rounded-2xl
+            border-2 border-white/15           
+            bg-white/10                        
+            shadow-xl shadow-black/20
+            backdrop-blur-md
+          "
+        >
+          <div className="sm:mx-auto sm:w-full sm:max-w-sm">
+            {/* kept logo commented */}
+            {/* <img
+              src="..."
+              alt="Your Company"
+              className="mx-auto h-10 w-auto"
+            /> */}
+            <h2 className="mt-2 text-center text-2xl font-bold tracking-tight text-white">
+              {/* CHANGED: Heading to Login context */}
+              Login
+            </h2>
+          </div>
 
-      <label htmlFor="password">Password</label>
-      <input 
-        type="password" 
-        name="password" 
-        onChange={handleOnChange} 
-        placeholder="Password" 
-        required
-      />
+          <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-sm">
+            {/* Integrated controlled form */}
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <div>
+                <label
+                  htmlFor="email"
+                  className="block text-sm font-medium text-gray-100"
+                >
+                  Email address
+                </label>
+                <div className="mt-2">
+                  <input
+                    id="email"
+                    type="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleOnChange}
+                    placeholder="Enter valid email"
+                    required
+                    autoComplete="email"
+                    className="block w-full rounded-md bg-white/5 px-3 py-1.5 text-base text-white outline-1 -outline-offset-1 outline-white/10 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-blue-400 sm:text-sm" /* CHANGED: focus blue */
+                  />
+                </div>
+              </div>
 
-      <button type="submit">Login</button>
-    </form>
-  )
-}
+              <div>
+                <div className="flex items-center justify-between">
+                  <label
+                    htmlFor="password"
+                    className="block text-sm font-medium text-gray-100"
+                  >
+                    Password
+                  </label>
+                  <a
+                    href="#"
+                    className="text-sm font-medium text-blue-300 hover:text-blue-200" /* CHANGED: optional forgot link styling */
+                  >
+                    Forgot password?
+                  </a>
+                </div>
+                <div className="mt-2">
+                  <input
+                    id="password"
+                    type="password"
+                    name="password"
+                    value={formData.password}
+                    onChange={handleOnChange}
+                    placeholder="Password"
+                    required
+                    autoComplete="current-password" /* CHANGED: correct autoComplete for login */
+                    className="block w-full rounded-md bg-white/5 px-3 py-1.5 text-base text-white outline-1 -outline-offset-1 outline-white/10 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-blue-400 sm:text-sm" /* CHANGED: focus blue */
+                  />
+                </div>
+              </div>
 
-export default Login
+              {errorMsg ? (
+                <p className="text-sm text-rose-200">{errorMsg}</p> // CHANGED: show errors
+              ) : null}
+
+              <div>
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="
+                    flex w-full justify-center rounded-md
+                    bg-blue-600 hover:bg-blue-500            /* CHANGED: button blue */
+                    px-3 py-2 text-sm font-semibold text-white
+                    focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-400  /* CHANGED: focus color */
+                    disabled:opacity-60 disabled:cursor-not-allowed
+                  "
+                >
+                  {loading ? "Signing in..." : "Sign in"}{" "}
+                  {/* CHANGED: button label */}
+                </button>
+              </div>
+            </form>
+
+            <p className="mt-8 text-center text-sm text-gray-200">
+              {/* CHANGED: footer to signup CTA */}
+              New here?{" "}
+              <a
+                href="/signup"
+                className="font-semibold text-blue-200 hover:text-blue-100" /* CHANGED: link color to blue */
+              >
+                Create an account
+              </a>
+            </p>
+          </div>
+        </div>
+      </div>
+    </>
+  );
+};
+
+export default Login;
