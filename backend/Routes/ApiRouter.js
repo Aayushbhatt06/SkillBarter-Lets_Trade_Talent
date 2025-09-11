@@ -12,7 +12,7 @@ const projectSkills = require("../Controllers/projectSkills.js");
 const getTagLines = require("../Controllers/tagline.js");
 
 router.post("/addskill", LoggedInOnly, addSkills);
-router.post("/findskilled", LoggedInOnly, findUserSk);
+router.post("/findskilled", findUserSk);
 router.post("/projects", LoggedInOnly, addProject);
 router.post("/post", LoggedInOnly, addPost);
 router.get("/fetchposts", fetchPosts);

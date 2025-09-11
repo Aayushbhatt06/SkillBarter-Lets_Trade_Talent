@@ -8,6 +8,29 @@ const Navbar = () => {
   const typingRef = useRef(null);
   const cycleRef = useRef(null);
   const isMounted = useRef(true);
+  const [search, setSearch] = useState("");
+  const handelOnChange = (e) => {
+    setSearch(e.target.value);
+  };
+
+  const handleSubmit = async(e) => {
+    e.preventDefault();
+    try {
+      const req = search.trim().split(" ");
+      const res = await fetch("http://localhost:8080/api/findskilled",{
+        method: "POST",
+        headers:{
+          "Content-Type":"application/json"
+        },
+        body:JSON.stringify(req)
+      });
+
+      const data = await res.json();
+      if(data.success){
+        
+      }
+    } catch (err) {}
+  };
 
   const clearTyping = () => {
     if (typingRef.current) {
@@ -85,11 +108,7 @@ const Navbar = () => {
 
         {/* Center: search (stays centered, max width for large screens) */}
         <div className="w-full md:w-1/2 md:max-w-2xl md:px-2">
-          <form
-            onSubmit={(e) => e.preventDefault()}
-            className="relative"
-            role="search"
-          >
+          <form onSubmit={handleSubmit} className="relative" role="search">
             {/* Search icon inside input */}
             <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-slate-600">
               <Search size={18} />
@@ -97,6 +116,8 @@ const Navbar = () => {
 
             {/* Input (pill) with space on right for button */}
             <input
+              onChange={handelOnChange}
+              value={search}
               type="search"
               placeholder="Search skills, people, or tags"
               className="w-full rounded-full bg-white/90 pl-12 pr-28 py-2.5 text-sm text-slate-800 placeholder:text-slate-500 shadow-sm

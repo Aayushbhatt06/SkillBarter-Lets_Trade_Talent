@@ -13,20 +13,21 @@ import {
   Target,
   Plus,
 } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const HomePage = () => {
   const [likedPosts, setLikedPosts] = useState(new Set());
 
   const toggleLike = (postId) => {
     const newLiked = new Set(likedPosts);
-    if (newLiked.has(postId)) {
+    if (newLiked.has(postId)) { 
       newLiked.delete(postId);
     } else {
       newLiked.add(postId);
     }
     setLikedPosts(newLiked);
   };
-
+  
   // Sample data
   const posts = [
     {
@@ -85,41 +86,41 @@ const HomePage = () => {
           </div> */}
 
           <nav className="space-y-2">
-            <a
-              href="#"
+            <Link
+              to="/"
               className="flex items-center space-x-3 px-4 py-3 text-blue-600 bg-slate-50 rounded-lg font-medium"
             >
               <Home size={20} />
               <span>Home</span>
-            </a>
-            <a
-              href="#"
+            </Link>
+            <Link
+              to="/messages"
               className="flex items-center space-x-3 px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-lg"
             >
               <MessageSquare size={20} />
               <span>Messages</span>
-            </a>
-            <a
-              href="#"
+            </Link>
+            <Link
+              to="#"
               className="flex items-center space-x-3 px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-lg"
             >
               <User size={20} />
               <span>Profile</span>
-            </a>
-            <a
-              href="#"
+            </Link>
+            <Link
+              to="#"
               className="flex items-center space-x-3 px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-lg"
-            > 
+            >
               <Bell size={20} />
               <span>Notifications</span>
-            </a>
-            <a
-              href="#"
+            </Link>
+            <Link
+              to="#"
               className="flex items-center space-x-3 px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-lg"
             >
               <Settings size={20} />
               <span>Settings</span>
-            </a>
+            </Link>
           </nav>
 
           <div className="mt-8 p-4 bg-slate-50 rounded-lg">

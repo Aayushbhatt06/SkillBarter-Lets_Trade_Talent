@@ -22,10 +22,22 @@ const router = createBrowserRouter([
 
   {
     path: "/",
-    element: <Layout />,
+    element: (
+      <ProtectedRoute>
+        <Layout />
+      </ProtectedRoute>
+    ),
     children: [
       {
-        index: true,
+        path:"/",
+        element: (
+          <ProtectedRoute>
+            <Home />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path:"/message",
         element: (
           <ProtectedRoute>
             <Home />
@@ -39,7 +51,6 @@ const router = createBrowserRouter([
 export default function App() {
   const [mode, setMode] = useState(false);
   const [dl, setDl] = useState("light");
-  
 
   return (
     <ModeContext.Provider value={{ mode, setMode }}>

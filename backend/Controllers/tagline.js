@@ -6,7 +6,7 @@ const getTagLines = async (req, res) => {
 
     const docs = await tagModel.find({}, { tagLines: 1, _id: 0 }).lean();
     const tagLines = docs.map((d) => d.tagLines).filter(Boolean);
-    console.log(tagLines);
+    // console.log(tagLines);
     res.json({ success: true, tagLines });
   } catch (err) {
     res.status(500).json({
