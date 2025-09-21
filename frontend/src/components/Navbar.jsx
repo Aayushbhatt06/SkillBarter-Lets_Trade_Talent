@@ -8,26 +8,26 @@ const Navbar = () => {
   const typingRef = useRef(null);
   const cycleRef = useRef(null);
   const isMounted = useRef(true);
-  const [search, setSearch] = useState("");
+  const [searchInput, setSearch] = useState("");
   const handelOnChange = (e) => {
     setSearch(e.target.value);
   };
 
-  const handleSubmit = async(e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const req = search.trim().split(" ");
-      const res = await fetch("http://localhost:8080/api/findskilled",{
+      const search = searchInput.trim().split(" ");
+      const res = await fetch("http://localhost:8080/api/findskilled", {
         method: "POST",
-        headers:{
-          "Content-Type":"application/json"
+        headers: {
+          "Content-Type": "application/json",
         },
-        body:JSON.stringify(req)
+        body: JSON.stringify({ search }),
       });
 
       const data = await res.json();
-      if(data.success){
-        
+      if (data.success) {
+        console.log(data);
       }
     } catch (err) {}
   };
@@ -117,7 +117,7 @@ const Navbar = () => {
             {/* Input (pill) with space on right for button */}
             <input
               onChange={handelOnChange}
-              value={search}
+              value={searchInput}
               type="search"
               placeholder="Search skills, people, or tags"
               className="w-full rounded-full bg-white/90 pl-12 pr-28 py-2.5 text-sm text-slate-800 placeholder:text-slate-500 shadow-sm

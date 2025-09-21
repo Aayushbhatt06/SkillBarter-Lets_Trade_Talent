@@ -7,7 +7,7 @@ const projectSchema = new mongoose.Schema({
     trim: true
   },
   requiredSkills: {
-    type: [String],  // Array of skills
+    type: [String], 
     required: true
   },
   description: {
@@ -17,12 +17,12 @@ const projectSchema = new mongoose.Schema({
   },
   fulfilled: {
     type: Boolean,
-    default: false  // false = live, true = completed
+    default: false  //false = live, true = completed
   },
   userId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',    // Reference to User collection
-    // required: true
+    ref: 'User',
+    required: true
   },
   createdAt: {
     type: Date, 

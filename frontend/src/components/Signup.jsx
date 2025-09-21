@@ -28,7 +28,6 @@ const Signup = () => {
         body: JSON.stringify(formData),
       });
 
-      
       if (!res.ok) {
         const text = await res.text();
         throw new Error(text || `Request failed: ${res.status}`);
@@ -52,7 +51,6 @@ const Signup = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800 flex items-center justify-center px-6 py-12">
-      
       <div
         className=" 
           max-w-sm p-5 rounded-2xl
@@ -69,7 +67,6 @@ const Signup = () => {
         </div>
 
         <div className="mt-8">
-          
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
               <label
@@ -88,7 +85,7 @@ const Signup = () => {
                   placeholder="Enter your Name"
                   required
                   autoComplete="name"
-                  className="block w-full rounded-md bg-white/5 px-3 py-1.5 text-base text-white outline-1 -outline-offset-1 outline-white/10 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-blue-400 sm:text-sm" 
+                  className="block w-full rounded-md bg-white/5 px-3 py-1.5 text-base text-white outline-1 -outline-offset-1 outline-white/10 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-blue-400 sm:text-sm"
                 />
               </div>
             </div>
@@ -110,7 +107,7 @@ const Signup = () => {
                   placeholder="Enter valid email"
                   required
                   autoComplete="email"
-                  className="block w-full rounded-md bg-white/5 px-3 py-1.5 text-base text-white outline-1 -outline-offset-1 outline-white/10 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-blue-400 sm:text-sm" 
+                  className="block w-full rounded-md bg-white/5 px-3 py-1.5 text-base text-white outline-1 -outline-offset-1 outline-white/10 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-blue-400 sm:text-sm"
                 />
               </div>
             </div>
@@ -134,7 +131,7 @@ const Signup = () => {
                   placeholder="Password"
                   required
                   autoComplete="new-password"
-                  className="block w-full rounded-md bg-white/5 px-3 py-1.5 text-base text-white outline-1 -outline-offset-1 outline-white/10 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-blue-400 sm:text-sm" 
+                  className="block w-full rounded-md bg-white/5 px-3 py-1.5 text-base text-white outline-1 -outline-offset-1 outline-white/10 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-blue-400 sm:text-sm"
                 />
               </div>
             </div>
@@ -164,7 +161,7 @@ const Signup = () => {
             Already have an account?{" "}
             <a
               href="/login"
-              className="font-semibold text-blue-200 hover:text-blue-100" 
+              className="font-semibold text-blue-200 hover:text-blue-100"
             >
               Sign in
             </a>

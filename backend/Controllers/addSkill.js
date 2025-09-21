@@ -54,37 +54,81 @@ const addSkills = async (req, res) => {
 };
 
 // Controller to find users by skills and return their emails
+// const findUserSk = async (req, res) => {
+//   try {
+//     const { skills } = req.body;
+
+//     // Proper validation for the skills array
+//     if (!skills || !Array.isArray(skills) || skills.length === 0) {
+//       return res.status(400).json({
+//         success: false,
+//         message: "An array of skills is required.",
+//       });
+//     }
+
+//     // Find users that have any skill in the given skills array
+//     const users = await UserModel.find({
+//       skills: { $in: skills },
+//     }).select("email -_id"); // select only 'email', exclude '_id'
+
+//     if (!users || users.length === 0) {
+//       return res.status(404).json({
+//         success: false,
+//         message: "No users found with the required skills.",
+//       });
+//     }
+
+//     // Extract emails from found users
+//     const emails = users.map((user) => user.email);
+
+//     return res.status(200).json({
+//       success: true,
+//       message: "Users found with matching skills.",
+//       emails: emails,
+//     });
+//   } catch (err) {
+//     console.error(err);
+//     return res.status(500).json({
+//       success: false,
+//       message: "Server error while searching for users.",
+//     });
+//   }
+// };
+
 const findUserSk = async (req, res) => {
   try {
-    const { skills } = req.body;
+    let { search } = req.body;
 
-    // Proper validation for the skills array
-    if (!skills || !Array.isArray(skills) || skills.length === 0) {
+    // Normalize input to always be an array
+    if (!search || (Array.isArray(search) && search.length === 0)) {
       return res.status(400).json({
         success: false,
-        message: "An array of skills is required.",
+        message: "Search input (word or array) is required.",
       });
     }
+    if (!Array.isArray(search)) {
+      search = [search]; // convert single word into array
+    }
 
-    // Find users that have any skill in the given skills array
+    // Build OR query for both skills and name
     const users = await UserModel.find({
-      skills: { $in: skills },
-    }).select("email -_id"); // select only 'email', exclude '_id'
+      $or: [
+        { skills: { $in: search } },
+        { name: { $in: search.map((word) => new RegExp(word, "i")) } },
+      ],
+    }).select("name _id");
 
     if (!users || users.length === 0) {
-      return res.status(404).json({
-        success: false,
-        message: "No users found with the required skills.",
+      return res.status(200).json({
+        success: true,
+        message: "No users found with the given search.",
       });
     }
-
-    // Extract emails from found users
-    const emails = users.map((user) => user.email);
 
     return res.status(200).json({
       success: true,
-      message: "Users found with matching skills.",
-      emails: emails,
+      message: "Users found.",
+      users: users,
     });
   } catch (err) {
     console.error(err);

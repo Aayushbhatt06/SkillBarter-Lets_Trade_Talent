@@ -6,6 +6,7 @@ import Home from "./components/Home";
 import Login from "./components/Login";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { ModeContext, modeClassContext, tagContext } from "../Context/context";
+import Profile from "./components/Profile";
 
 const Layout = () => {
   return (
@@ -29,7 +30,7 @@ const router = createBrowserRouter([
     ),
     children: [
       {
-        path:"/",
+        path: "/",
         element: (
           <ProtectedRoute>
             <Home />
@@ -37,10 +38,18 @@ const router = createBrowserRouter([
         ),
       },
       {
-        path:"/message",
+        path: "/message",
         element: (
           <ProtectedRoute>
             <Home />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "/profile",
+        element: (
+          <ProtectedRoute>
+            <Profile />
           </ProtectedRoute>
         ),
       },

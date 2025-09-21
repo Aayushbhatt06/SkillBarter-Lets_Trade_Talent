@@ -1,26 +1,39 @@
-const { required } = require('joi');
-const mongoose = require('mongoose')
-
-const Schema = mongoose.Schema;
+const mongoose = require("mongoose");
+const { Schema } = mongoose;
 
 const UserSchema = new Schema({
-    name:{
-        type:String,
-        required:true,
+  name: {
+    type: String,
+    required: true,
+  },
+  email: {
+    type: String,
+    required: true,
+    unique: true,
+  },
+  bio: {
+    type: String,
+    default: "",
+  },
+  skills: {
+    type: [String],
+    default: [],
+  },
+  password: {
+    type: String,
+    required: true,
+  },
+  image: {
+    type: String,
+    default: "",
+  },
+  connections: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: "user",
     },
-    email:{
-        type:String,
-        required:true,
-        unique:true
-    },
-    skills:{
-        type:[String],
-    },
-    password:{
-        type:String,
-        required:true,
-    }
+  ],
 });
 
-const UserModel = mongoose.model("user",UserSchema);
-module.exports=UserModel;
+const UserModel = mongoose.model("user", UserSchema);
+module.exports = UserModel;
