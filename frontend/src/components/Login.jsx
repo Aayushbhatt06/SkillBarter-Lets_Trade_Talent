@@ -1,14 +1,17 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { login } from "../Redux/userSlice";
 
 const Login = () => {
   const [formData, setFormData] = useState({
     email: "",
     password: "",
   });
+  const dispatch = useDispatch();
 
-  const [loading, setLoading] = useState(false); 
-  const [errorMsg, setErrorMsg] = useState(""); 
+  const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
   const navigate = useNavigate();
 
   const handleOnChange = (e) => {
@@ -17,11 +20,12 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setErrorMsg(""); 
-    setLoading(true); 
+    setErrorMsg("");
+    setLoading(true);
     try {
       const res = await fetch("http://localhost:8080/auth/login", {
         method: "POST",
+        credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
       });
@@ -30,24 +34,30 @@ const Login = () => {
       console.log("Response:", data.message);
 
       if (data?.success) {
-        localStorage.setItem("token", data.jwtToken);
+        const userData = {
+          id: data.data._id,
+          name: data.data.name,
+          email: data.data.email,
+          token: data.jwtToken,
+          image: data.data.image,
+        };
+        dispatch(login(userData)); // Save to redux
+        // localStorage.setItem("token", data.jwtToken);
         navigate("/");
       } else {
-        setErrorMsg(data.message || "Login failed"); 
+        setErrorMsg(data.message || "Login failed");
       }
     } catch (err) {
       console.error("Error:", err);
-      setErrorMsg(err.message || "Something went wrong"); 
+      setErrorMsg(err.message || "Something went wrong");
     } finally {
-      setLoading(false); 
+      setLoading(false);
     }
   };
 
   return (
     <>
-      
       <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800 flex items-center justify-center px-6 py-12">
-        
         <div
           className="
             w-full max-w-sm p-5 rounded-2xl
@@ -82,7 +92,7 @@ const Login = () => {
                     placeholder="Enter valid email"
                     required
                     autoComplete="email"
-                    className="block w-full rounded-md bg-white/5 px-3 py-1.5 text-base text-white outline-1 -outline-offset-1 outline-white/10 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-blue-400 sm:text-sm" 
+                    className="block w-full rounded-md bg-white/5 px-3 py-1.5 text-base text-white outline-1 -outline-offset-1 outline-white/10 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-blue-400 sm:text-sm"
                   />
                 </div>
               </div>
@@ -97,7 +107,7 @@ const Login = () => {
                   </label>
                   <a
                     href="#"
-                    className="text-sm font-medium text-blue-300 hover:text-blue-200" 
+                    className="text-sm font-medium text-blue-300 hover:text-blue-200"
                   >
                     Forgot password?
                   </a>
@@ -111,14 +121,14 @@ const Login = () => {
                     onChange={handleOnChange}
                     placeholder="Password"
                     required
-                    autoComplete="current-password" 
-                    className="block w-full rounded-md bg-white/5 px-3 py-1.5 text-base text-white outline-1 -outline-offset-1 outline-white/10 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-blue-400 sm:text-sm" 
+                    autoComplete="current-password"
+                    className="block w-full rounded-md bg-white/5 px-3 py-1.5 text-base text-white outline-1 -outline-offset-1 outline-white/10 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-blue-400 sm:text-sm"
                   />
                 </div>
               </div>
 
               {errorMsg ? (
-                <p className="text-sm text-rose-200">{errorMsg}</p> 
+                <p className="text-sm text-rose-200">{errorMsg}</p>
               ) : null}
 
               <div>

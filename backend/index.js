@@ -5,8 +5,8 @@ const bodyParser = require("body-parser");
 const cors = require("cors");
 const AuthRouter = require("./Routes/AuthRouter");
 const ApiRouter = require("./Routes/ApiRouter");
-const LoggedInOnly = require("./Middlewares/LoggedInOnly");
-const fetchProfile = require("./Controllers/fetchProfile");
+const cookieParser = require("cookie-parser");
+const profileRouter = require("./Routes/profileRoutes");
 require("dotenv").config();
 
 const PORT = process.env.PORT;
@@ -25,10 +25,11 @@ app.use(
     credentials: true,
   })
 );
-
+app.use(cookieParser());
 app.use("/auth", AuthRouter);
 app.use("/api", ApiRouter);
-app.get("/profile", LoggedInOnly, fetchProfile);
+app.use("/profile", profileRouter);
+
 app.listen(PORT, () => {
   console.log(`server is running on ${PORT}`);
 });

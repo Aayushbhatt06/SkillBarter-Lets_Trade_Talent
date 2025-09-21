@@ -1,17 +1,21 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Menu, Search } from "lucide-react";
+import { useDispatch } from "react-redux";
+import { logout } from "../Redux/userSlice";
 
 const DEFAULT = "Let's Trade Talent!!!";
 
 const Navbar = () => {
+  const dispatch = useDispatch();
   const [tagline, setTagline] = useState("");
+  const [tags, setTags] = useState([]);
   const typingRef = useRef(null);
   const cycleRef = useRef(null);
   const isMounted = useRef(true);
+  const lastIndexRef = useRef(-1);
+
   const [searchInput, setSearch] = useState("");
-  const handelOnChange = (e) => {
-    setSearch(e.target.value);
-  };
+  const handelOnChange = (e) => setSearch(e.target.value);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -19,12 +23,9 @@ const Navbar = () => {
       const search = searchInput.trim().split(" ");
       const res = await fetch("http://localhost:8080/api/findskilled", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ search }),
       });
-
       const data = await res.json();
       if (data.success) {
         console.log(data);
@@ -51,30 +52,46 @@ const Navbar = () => {
     }, speed);
   };
 
+  // Get one random index different from the previous one
+  const nextRandomIndex = (len) => {
+    if (len <= 1) return 0;
+    let idx = Math.floor(Math.random() * len);
+    if (idx === lastIndexRef.current) {
+      idx = (idx + 1) % len;
+    }
+    lastIndexRef.current = idx;
+    return idx;
+  };
+
   const getTag = async () => {
     try {
       const res = await fetch("http://localhost:8080/api/tagline");
-      if (!res.ok) return typeText(DEFAULT);
+      if (!res.ok) {
+        typeText(DEFAULT);
+        return;
+      }
 
       let data = null;
       try {
         data = await res.json();
       } catch {
-        return typeText(DEFAULT);
+        typeText(DEFAULT);
+        return;
       }
 
-      const list = Array.isArray(data?.taglines)
-        ? data.taglines
-        : Array.isArray(data?.tagLines)
-        ? data.tagLines
-        : null;
+      const list = Array.isArray(data?.tagLines)
+        ? data.tagLines.filter(Boolean)
+        : [];
+      if (!list.length) {
+        setTags([]);
+        typeText(DEFAULT);
+        return;
+      }
+      setTags(list);
 
-      if (!data?.success || !list || list.length === 0)
-        return typeText(DEFAULT);
-
-      const randomTag =
-        list[Math.floor(Math.random() * list.length)] || DEFAULT;
-      typeText(randomTag, 80);
+      // Start typing a random tagline immediately after fetch success
+      const firstIdx = nextRandomIndex(list.length);
+      typeText(list[firstIdx] || DEFAULT);
     } catch {
       typeText(DEFAULT);
     }
@@ -83,22 +100,38 @@ const Navbar = () => {
   useEffect(() => {
     isMounted.current = true;
     getTag();
+
+    // Cycle clears and triggers the next random tagline
+    const cycleMs = 6000;
     cycleRef.current = setInterval(() => {
       clearTyping();
-      getTag();
-    }, 6000);
+      const list = tags && tags.length ? tags : [DEFAULT];
+      const idx = nextRandomIndex(list.length);
+      // small timeout ensures previous interval fully cleared
+      setTimeout(() => typeText(list[idx] || DEFAULT), 100);
+    }, cycleMs);
 
     return () => {
       isMounted.current = false;
       clearTyping();
       if (cycleRef.current) clearInterval(cycleRef.current);
     };
-  }, []);
+    // Depend on tags length so the cycle can use fetched data once available,
+    // but not retrigger on every tagline character update.
+  }, [tags.length]);
+
+  const handleLogout = async () => {
+    await fetch("http://localhost:8080/auth/logout", {
+      method: "POST",
+      credentials: "include",
+    });
+    dispatch(logout());
+    window.location.reload();
+  };
 
   return (
     <header className="bg-slate-800">
       <div className="mx-auto flex flex-col gap-2 px-4 py-2 md:flex-row md:items-center md:justify-between">
-        {/* Left: menu + tagline */}
         <div className="flex items-center gap-2 md:w-1/4 md:min-w-[220px]">
           <Menu size={24} className="text-white" />
           <h6 className="truncate ml-5 mt-2 !text-[16px] font-semibold text-white">
@@ -106,15 +139,12 @@ const Navbar = () => {
           </h6>
         </div>
 
-        {/* Center: search (stays centered, max width for large screens) */}
         <div className="w-full md:w-1/2 md:max-w-2xl md:px-2">
           <form onSubmit={handleSubmit} className="relative" role="search">
-            {/* Search icon inside input */}
             <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-slate-600">
               <Search size={18} />
             </span>
 
-            {/* Input (pill) with space on right for button */}
             <input
               onChange={handelOnChange}
               value={searchInput}
@@ -124,7 +154,6 @@ const Navbar = () => {
                          focus:outline-none focus:ring-2 focus:ring-white-300"
             />
 
-            {/* Rounded button positioned inside the input field */}
             <button
               type="submit"
               className="absolute right-0 top-1/2 -translate-y-1/2  bg-amber-700 px-4 py-2.5 text-sm font-medium text-white
@@ -135,9 +164,13 @@ const Navbar = () => {
           </form>
         </div>
 
-        {/* Right: profile (or actions) */}
         <div className="flex items-center justify-end gap-3 md:w-1/4 md:min-w-[180px]">
-          <div className="h-8 w-8 hidden rounded-full border border-amber-900/30 bg-amber-800/70 sm:flex" />
+          <button
+            onClick={handleLogout}
+            className="bg-red-700 px-4 py-2 rounded text-white"
+          >
+            Logout
+          </button>
         </div>
       </div>
     </header>

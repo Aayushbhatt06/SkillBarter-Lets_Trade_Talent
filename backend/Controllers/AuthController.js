@@ -61,14 +61,20 @@ const login = async (req, res) => {
 
     const jwtToken = jwt.sign(
       { email: user.email, _id: user._id },
-      process.env.SECRET, 
+      process.env.SECRET,
       { expiresIn: "24h" }
     );
+
+    res.cookie("jwt", jwtToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      maxAge: 24 * 60 * 60 * 1000,
+    });
 
     res.status(200).json({
       message: "Login Successful",
       success: true,
-      jwtToken,
       data: {
         _id: user._id,
         name: user.name,
@@ -85,7 +91,21 @@ const login = async (req, res) => {
   }
 };
 
+const logout = (req, res) => {
+  res.clearCookie("jwt", {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "strict",
+  });
+
+  res.status(200).json({
+    success: true,
+    message: "Logged out successfully",
+  });
+};
+
 module.exports = {
   signup,
   login,
+  logout,
 };

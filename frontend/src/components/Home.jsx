@@ -20,14 +20,14 @@ const HomePage = () => {
 
   const toggleLike = (postId) => {
     const newLiked = new Set(likedPosts);
-    if (newLiked.has(postId)) { 
+    if (newLiked.has(postId)) {
       newLiked.delete(postId);
     } else {
       newLiked.add(postId);
     }
     setLikedPosts(newLiked);
   };
-  
+
   // Sample data
   const posts = [
     {
@@ -101,7 +101,7 @@ const HomePage = () => {
               <span>Messages</span>
             </Link>
             <Link
-              to="#"
+              to="/profile"
               className="flex items-center space-x-3 px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-lg"
             >
               <User size={20} />
