@@ -1,5 +1,6 @@
 import React from "react";
 import { Camera, Target } from "lucide-react";
+const defImg = "image.png";
 
 const InstantPost = () => {
   return (
@@ -8,7 +9,7 @@ const InstantPost = () => {
         <div className="bg-white rounded-lg border border-gray-200 p-4">
           <div className="flex items-center space-x-3 mb-3">
             <img
-              src="https://api.dicebear.com/7.x/avataaars/svg?seed=user"
+              src={defImg}
               alt="Your avatar"
               className="w-10 h-10 rounded-full"
             />
