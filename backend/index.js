@@ -8,7 +8,7 @@ const ApiRouter = require("./Routes/ApiRouter");
 const cookieParser = require("cookie-parser");
 const profileRouter = require("./Routes/profileRoutes");
 require("dotenv").config();
-
+app.use(express.urlencoded({ extended: false }));
 const PORT = process.env.PORT;
 
 app.get("/ping", (req, res) => {

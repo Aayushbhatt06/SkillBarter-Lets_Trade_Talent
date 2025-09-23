@@ -1,9 +1,10 @@
 const userModel = require("../Models/User");
+const { uploadToCloudinary } = require("../utils/cloudinary");
 
 const editProfile = async (req, res) => {
   try {
     const userId = req.user._id;
-    const { name, bio, image, skills } = req.body;
+    const { name, bio, skills } = req.body;
 
     const user = await userModel.findById(userId);
     if (!user) {
@@ -12,10 +13,25 @@ const editProfile = async (req, res) => {
         message: "User not found",
       });
     }
-    user.name = name || user.name;
-    user.bio = bio || user.bio;
-    user.skills = skills || user.skills;
-    user.image = image || user.image;   
+    let url;
+    if (req.file) {
+      const localFilePath = req.file.path;
+      const result = await uploadToCloudinary(localFilePath);
+      if (!result) {
+        return res.status(500).json({ error: "Upload failed" });
+      }
+      url = result.secure_url;
+    }
+    if (name) user.name = name;
+    if (bio) user.bio = bio;
+    if (skills) {
+      try {
+        user.skills = JSON.parse(skills);
+      } catch {
+        user.skills = skills;
+      }
+    }
+    if (url) user.image = url;
 
     await user.save();
 
@@ -33,4 +49,4 @@ const editProfile = async (req, res) => {
   }
 };
 
-module.exports = editProfile;
+module.exports = { editProfile };

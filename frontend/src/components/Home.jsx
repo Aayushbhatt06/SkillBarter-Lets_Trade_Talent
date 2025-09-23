@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Heart,
   MessageCircle,
@@ -14,67 +15,78 @@ import {
   Plus,
 } from "lucide-react";
 import { Link } from "react-router-dom";
+import InstantPost from "./InstantPost";
 
 const HomePage = () => {
-  const [likedPosts, setLikedPosts] = useState(new Set());
+  const navigate = useNavigate();
+  const [posts, setPosts] = useState([]);
+  const [projects, setProjects] = useState([]);
+  const [desc, setDesc] = useState("");
+  const [image, setImage] = useState("");
+  const defImg = "image.png";
 
-  const toggleLike = (postId) => {
-    const newLiked = new Set(likedPosts);
-    if (newLiked.has(postId)) {
-      newLiked.delete(postId);
-    } else {
-      newLiked.add(postId);
+  function timeAgo(dateString) {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diff = now - date; // difference in ms
+
+    const seconds = Math.floor(diff / 1000);
+    const minutes = Math.floor(seconds / 60);
+    const hours = Math.floor(minutes / 60);
+    const days = Math.floor(hours / 24);
+    const months = Math.floor(days / 30);
+
+    if (seconds < 60) return `${seconds} seconds ago`;
+    if (minutes < 60) return `${minutes} minutes ago`;
+    if (hours < 24) return `${hours} hours ago`;
+    if (days < 30) return `${days} days ago`;
+    return `${months} months ago`;
+  }
+
+  //Fetch the posts from backend
+
+  const fetchPosts = async () => {
+    try {
+      const res = await fetch("http://localhost:8080/api/fetchposts", {
+        method: "GET",
+      });
+      if (!res.ok) {
+        alert("unable to fetch posts");
+      }
+      const data = await res.json();
+      await console.log(data.posts);
+      setPosts(data.posts);
+    } catch (error) {
+      console.log(error);
     }
-    setLikedPosts(newLiked);
   };
 
-  // Sample data
-  const posts = [
-    {
-      id: 1,
-      username: "john_developer",
-      userAvatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=john",
-      timeAgo: "2 hours ago",
-      description:
-        "Just completed my first full-stack MERN application! Looking for feedback from the community. Would love to connect with other developers.",
-      image: "https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=500",
-      likes: 24,
-      comments: 8,
-    },
-    {
-      id: 2,
-      username: "sarah_designer",
-      userAvatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=sarah",
-      timeAgo: "4 hours ago",
-      description:
-        "New UI/UX design for a fitness app. What do you think about the color scheme and layout? Always open to constructive criticism!",
-      image:
-        "https://images.unsplash.com/photo-1611224923853-80b023f02d71?w=500",
-      likes: 45,
-      comments: 12,
-    },
-  ];
+  const like = async () => {};
+  useEffect(() => {
+    fetchPosts();
+    console.log(posts);
+  }, []);
 
-  const projects = [
-    {
-      id: 1,
-      name: "E-commerce Platform",
-      description:
-        "Building a modern e-commerce platform with React, Node.js, and MongoDB. Need help with payment integration.",
-      techStack: ["React", "Node.js", "MongoDB", "Stripe"],
-      requirements: ["Backend Developer", "UI/UX Designer"],
-      posted: "1 day ago",
-    },
-    {
-      id: 2,
-      name: "Mobile Fitness App",
-      description:
-        "Creating a fitness tracking app with React Native. Looking for developers interested in health tech.",
-      techStack: ["React Native", "Firebase", "Redux"],
-      requirements: ["Mobile Developer", "Backend Developer"],
-      posted: "3 days ago",
-    },
-  ];
+  // const projects = [
+  //   {
+  //     id: 1,
+  //     name: "E-commerce Platform",
+  //     description:
+  //       "Building a modern e-commerce platform with React, Node.js, and MongoDB. Need help with payment integration.",
+  //     techStack: ["React", "Node.js", "MongoDB", "Stripe"],
+  //     requirements: ["Backend Developer", "UI/UX Designer"],
+  //     posted: "1 day ago",
+  //   },
+  //   {
+  //     id: 2,
+  //     name: "Mobile Fitness App",
+  //     description:
+  //       "Creating a fitness tracking app with React Native. Looking for developers interested in health tech.",
+  //     techStack: ["React Native", "Firebase", "Redux"],
+  //     requirements: ["Mobile Developer", "Backend Developer"],
+  //     posted: "3 days ago",
+  //   },
+  // ];
 
   return (
     <div className="bg-gray-300 min-h-[97vh]">
@@ -108,14 +120,7 @@ const HomePage = () => {
               <span>Profile</span>
             </Link>
             <Link
-              to="#"
-              className="flex items-center space-x-3 px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-lg"
-            >
-              <Bell size={20} />
-              <span>Notifications</span>
-            </Link>
-            <Link
-              to="#"
+              to="/settings"
               className="flex items-center space-x-3 px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-lg"
             >
               <Settings size={20} />
@@ -135,104 +140,85 @@ const HomePage = () => {
 
         {/* Center Posts Feed */}
         <div className="flex-1 px-6 py-4 max-w-2xl">
-          <div className="mb-6">
-            <div className="bg-white rounded-lg border border-gray-200 p-4">
-              <div className="flex items-center space-x-3 mb-3">
-                <img
-                  src="https://api.dicebear.com/7.x/avataaars/svg?seed=user"
-                  alt="Your avatar"
-                  className="w-10 h-10 rounded-full"
-                />
-                <input
-                  type="text"
-                  placeholder="Share your skills, projects, or ask for help..."
-                  className="flex-1 bg-gray-100 rounded-full px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-              <div className="flex justify-between items-center pt-2 border-t border-gray-100">
-                <button className="flex items-center space-x-2 text-blue-600 hover:bg-slate-50 px-3 py-1 rounded">
-                  <Camera size={16} />
-                  <span>Photo</span>
-                </button>
-                <button className="flex items-center space-x-2 text-blue-600 hover:bg-slate-50 px-3 py-1 rounded">
-                  <Target size={16} />
-                  <span>Project</span>
-                </button>
-                <button className="bg-slate-600 text-white px-4 py-1 rounded-full hover:bg-slate-700">
-                  Post
-                </button>
-              </div>
-            </div>
-          </div>
+          <InstantPost />
 
           {/* Posts */}
           <div className="space-y-6">
             {posts.map((post) => (
               <div
-                key={post.id}
+                key={post._id}
                 className="bg-white rounded-lg border border-gray-200 overflow-hidden"
               >
                 {/* Post Header */}
-                <div className="p-4 flex items-center justify-between">
-                  <div className="flex items-center space-x-3">
+                <div className="p-4 flex items-center cursor-pointer justify-between">
+                  <div
+                    onClick={() => {
+                      navigate(`/load-profile?id=${post.userId}`);
+                    }}
+                    className="flex items-center space-x-3"
+                  >
                     <img
-                      src={post.userAvatar}
+                      src={post.pic ? post.pic : defImg}
                       alt={`${post.username} avatar`}
                       className="w-10 h-10 rounded-full"
                     />
                     <div>
                       <h3 className="font-semibold text-gray-900">
-                        @{post.username}
+                        {post.username || "Aayush"}
                       </h3>
                       <p className="text-sm text-gray-500">{post.timeAgo}</p>
                     </div>
                   </div>
-                  <button className="text-gray-400 hover:text-gray-600">
-                    <MoreHorizontal size={20} />
-                  </button>
+                  <div className="ago">
+                    <span>{timeAgo(post.createdAt)}</span>
+                  </div>
                 </div>
 
                 {/* Post Content */}
                 <div className="px-4 pb-3">
-                  <p className="text-gray-800 leading-relaxed">
-                    {post.description}
-                  </p>
+                  <p className="text-gray-800 leading-relaxed">{post.desc}</p>
                 </div>
 
                 {/* Post Image */}
-                {post.image && (
-                  <div className="relative">
-                    <img
-                      src={post.image}
-                      alt="Post content"
-                      className="w-full h-64 object-cover"
-                    />
-                  </div>
-                )}
+                <div
+                  className="image cursor-pointer"
+                  onClick={() => {
+                    navigate(`/post?id=${post._id}`);
+                  }}
+                >
+                  {post.image && (
+                    <div className="relative">
+                      <img
+                        src={post.image}
+                        alt="Post content"
+                        className="w-full h-64 object-cover"
+                      />
+                    </div>
+                  )}
+                </div>
 
                 {/* Post Actions */}
                 <div className="p-4">
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center space-x-4">
                       <button
-                        onClick={() => toggleLike(post.id)}
+                        onClick={() => like()}
                         className="flex items-center space-x-1 text-gray-600 hover:text-red-500"
                       >
                         <Heart
                           size={20}
-                          fill={likedPosts.has(post.id) ? "#ef4444" : "none"}
-                          className={
-                            likedPosts.has(post.id) ? "text-red-500" : ""
-                          }
+                          className="text-gray-500"
+                          onClick={(e) => {
+                            e.currentTarget.classList.toggle("text-red-500");
+                            e.currentTarget.classList.toggle("text-gray-500");
+                          }}
                         />
-                        <span className="text-sm">
-                          {post.likes + (likedPosts.has(post.id) ? 1 : 0)}
-                        </span>
+                        <span className="text-sm">{post.likes}</span>
                       </button>
 
                       <button className="flex items-center space-x-1 text-gray-600 hover:text-blue-500">
                         <MessageCircle size={20} />
-                        <span className="text-sm">{post.comments}</span>
+                        <span className="text-sm">{post.comments.length}</span>
                       </button>
 
                       <button className="flex items-center space-x-1 text-gray-600 hover:text-green-500">
@@ -256,13 +242,32 @@ const HomePage = () => {
                     />
                   </div>
                 </div>
+                <div className="commentsection ">
+                  {post.comments.map((comment) => (
+                    <div key={comment._id} className="flex flex-col">
+                      <div
+                        onClick={() => {
+                          navigate(`/load-profile?id=${comment.userId}`);
+                        }}
+                        className="flex cursor-pointer"
+                      >
+                        <img
+                          className="rounded-full w-10 h-10"
+                          src={comment.pic || defImg}
+                          alt=""
+                        />
+                        <span>{comment.username || "Anonymous User"}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
             ))}
           </div>
         </div>
 
         {/* Right Projects Section */}
-        <div className="w-80 bg-white border-l border-gray-200 p-4">
+        {/* <div className="w-80 bg-white border-l border-gray-200 p-4">
           <div className="sticky top-4">
             <div className="mb-6">
               <h2 className="text-xl font-bold text-gray-900 mb-4">
@@ -357,9 +362,10 @@ const HomePage = () => {
               </div>
             </div>
           </div>
-        </div>
+        </div> */}
       </div>
     </div>
+    // <></>
   );
 };
 

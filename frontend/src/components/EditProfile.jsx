@@ -5,7 +5,9 @@ const EditProfile = () => {
   const navigate = useNavigate();
   const [name, setName] = useState("");
   const [bio, setBio] = useState("");
+
   const [image, setImage] = useState("image.png");
+  const [file, setFile] = useState(null);
   const [skills, setSkills] = useState([]);
   const [newSkill, setNewSkill] = useState("");
 
@@ -46,31 +48,86 @@ const EditProfile = () => {
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
+      setFile(file);
       const reader = new FileReader();
       reader.onloadend = () => setImage(reader.result);
       reader.readAsDataURL(file);
     }
   };
 
-  const handleSave = async () => {
+  // const handleSave = async (e) => {
+  //   e.preventDefault();
+
+  //   try {
+  //     const res = await fetch("http://localhost:8080/profile/edit", {
+  //       method: "POST",
+  //       credentials: "include",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //         Accept: "application/json",
+  //       },
+  //       body: JSON.stringify({ name, bio, skills }),
+  //     });
+  //     if (!res.ok) {
+  //       alert("Something went Worng while updating");
+  //       return;
+  //     }
+  //     const data = await res.json();
+  //     navigate("/profile");
+  //   } catch (error) {
+  //     alert("Catching the error something went wrong");
+  //   }
+
+  //   //image
+  //   const formData = new FormData();
+  //   formData.append("profileImage", file);
+  //   try {
+  //     const res = await fetch("http://localhost:8080/profile/up-image", {
+  //       method: "POST",
+  //       credentials: "include",
+  //       body: formData,
+  //     });
+  //     if (!res.ok) {
+  //       alert("Something went Worng while updating");
+  //       return;
+  //     }
+  //     const data = await res.json();
+  //     setImage(data.url);
+  //     alert(data.message);
+  //     navigate("/profile");
+  //   } catch (error) {
+  //     alert("Catching the error something went wrong");
+  //   }
+  // };
+
+  const handleSave = async (e) => {
+    e.preventDefault();
+
+    const formData = new FormData();
+    formData.append("name", name);
+    formData.append("bio", bio);
+    formData.append("skills", JSON.stringify(skills));
+    if (file) {
+      formData.append("profileImage", file); // this works with multer
+    }
+
     try {
       const res = await fetch("http://localhost:8080/profile/edit", {
         method: "POST",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-        },
-        body: JSON.stringify({ name, bio, image, skills }),
+        credentials: "include", // keeps cookies/session for LoggedInOnly
+        body: formData,
       });
+
       if (!res.ok) {
-        alert("Something went Worng while updating");
+        alert("Something went wrong while updating");
         return;
       }
-      const data = res.json();
+
+      const data = await res.json();
+      alert(data.message);
       navigate("/profile");
     } catch (error) {
-      alert("Catching the error something went wrong");
+      alert("Error while saving profile");
     }
   };
 

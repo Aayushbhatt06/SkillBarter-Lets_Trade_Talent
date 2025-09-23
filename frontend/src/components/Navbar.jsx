@@ -2,10 +2,12 @@ import React, { useState, useEffect, useRef } from "react";
 import { Menu, Search } from "lucide-react";
 import { useDispatch } from "react-redux";
 import { logout } from "../Redux/userSlice";
+import { useNavigate } from "react-router-dom";
 
 const DEFAULT = "Let's Trade Talent!!!";
 
 const Navbar = () => {
+  const navigate = useNavigate();
   const dispatch = useDispatch();
   const [tagline, setTagline] = useState("");
   const [tags, setTags] = useState([]);
@@ -52,7 +54,6 @@ const Navbar = () => {
     }, speed);
   };
 
-  // Get one random index different from the previous one
   const nextRandomIndex = (len) => {
     if (len <= 1) return 0;
     let idx = Math.floor(Math.random() * len);
@@ -133,10 +134,17 @@ const Navbar = () => {
     <header className="bg-slate-800">
       <div className="mx-auto flex flex-col gap-2 px-4 py-2 md:flex-row md:items-center md:justify-between">
         <div className="flex items-center gap-2 md:w-1/4 md:min-w-[220px]">
-          <Menu size={24} className="text-white" />
-          <h6 className="truncate ml-5 mt-2 !text-[16px] font-semibold text-white">
-            SkillBarter : {tagline}
-          </h6>
+          <div className="heading flex gap-0 justify-items-start">
+            <h6
+              onClick={() => {}}
+              className="truncate ml-2 mt-2 !text-[16px] font-semibold text-white"
+            >
+              SkillBarter :{" "}
+            </h6>
+            <h6 className="truncate ml-2 mt-2 !text-[16px] font-semibold text-white">
+              {tagline}
+            </h6>
+          </div>
         </div>
 
         <div className="w-full md:w-1/2 md:max-w-2xl md:px-2">
