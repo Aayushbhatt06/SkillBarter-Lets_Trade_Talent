@@ -2,7 +2,7 @@ import React from "react";
 const defImg = "image.png";
 
 const CommentCard = ({ comment, navigate, timeAgo }) => (
-  <div className="bg-white p-3 rounded-lg border flex flex-col border-gray-200 shadow-sm hover:shadow-md transition-shadow duration-200">
+  <div className="bg-white p-2 rounded-lg border flex flex-col border-gray-200 shadow-sm hover:shadow-md transition-shadow duration-200">
     <div className="flex justify-between">
       <div
         onClick={() => navigate(`/load-profile?id=${comment.userId}`)}
@@ -19,7 +19,8 @@ const CommentCard = ({ comment, navigate, timeAgo }) => (
       </div>
       <div className="createdAt">{timeAgo(comment.createdAt)}</div>
     </div>
-    <div className="mt-2 text-gray-700 text-sm">{comment.text}</div>
+    <hr />
+    <div className="mt-2 text-gray-700 mx-4 mb-2 text-sm">{comment.text}</div>
   </div>
 );
 

@@ -5,8 +5,7 @@ const addPost = async (req, res) => {
   try {
     const { title, desc, image } = req.body;
     const userId = req.user._id;
-    const user = await userModel.findById(userId);
-    if (!title || !desc || !userId) {
+    if (!title || !desc) {
       return res.status(401).json({
         message: "title, description are compulsory",
         success: true,
@@ -21,7 +20,7 @@ const addPost = async (req, res) => {
       title,
       desc,
       image,
-      userId,
+      userId: user._id,
       createdAt: new Date(),
     });
 
@@ -59,7 +58,7 @@ const fetchPosts = async (req, res) => {
 const addComment = async (req, res) => {
   try {
     const { postId, comment } = req.body;
-    const userId = req.user._id;
+    const user = req.user;
 
     if (!postId || !comment) {
       return res.status(400).json({
@@ -74,8 +73,10 @@ const addComment = async (req, res) => {
       {
         $push: {
           comments: {
+            username: user.name,
+            pic: user.image,
             text: comment,
-            userId: userId,
+            userId: user._id,
             createdAt: new Date(),
           },
         },
@@ -106,29 +107,62 @@ const addComment = async (req, res) => {
 
 const like = async (req, res) => {
   try {
+    const userId = req.user._id;
     const { postId } = req.body;
+
     if (!postId) {
-      res.status(401).json({
+      return res.status(400).json({
         message: "Post Id is required",
         success: false,
       });
     }
-    const updatedPost = await Post.findByIdAndUpdate(
-      postId,
-      { $inc: { likes: 1 } },
-      { new: true }
-    );
-    if (!updatedPost) {
+    const user = await userModel.findById(userId);
+    const post = await postModel.findById(postId);
+
+    if (!post) {
       return res.status(404).json({
-        message: "post no longer available",
+        message: "Post no longer available",
         success: false,
       });
     }
+    if (!user) {
+      return res.status(404).json({
+        message: "User not found",
+        success: false,
+      });
+    }
+
+    if (post.likes.some((id) => id.toString() === userId.toString())) {
+      // Remove like
+      user.likedPosts = user.likedPosts.filter(
+        (id) => id.toString() !== postId.toString()
+      );
+      post.likes = post.likes.filter(
+        (id) => id.toString() !== userId.toString()
+      );
+
+      await Promise.all([user.save(), post.save()]);
+
+      return res.status(200).json({
+        message: "Like removed",
+        success: true,
+        updatedPost: post,
+      });
+    }
+
+    user.likedPosts.push(postId);
+
+    post.likes.push(userId);
+    await post.save();
+    await user.save();
+
     return res.status(200).json({
-      message: "Likes added successfully",
+      message: "Like added successfully",
       success: true,
+      updatedPost: post,
     });
   } catch (err) {
+    console.error("Like error:", err);
     return res.status(500).json({
       message: "Server not responding",
       success: false,

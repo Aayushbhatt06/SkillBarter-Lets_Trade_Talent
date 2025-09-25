@@ -7,8 +7,11 @@ const AuthRouter = require("./Routes/AuthRouter");
 const ApiRouter = require("./Routes/ApiRouter");
 const cookieParser = require("cookie-parser");
 const profileRouter = require("./Routes/profileRoutes");
+
 require("dotenv").config();
 app.use(express.urlencoded({ extended: false }));
+app.use(express.json());
+
 const PORT = process.env.PORT;
 
 app.get("/ping", (req, res) => {

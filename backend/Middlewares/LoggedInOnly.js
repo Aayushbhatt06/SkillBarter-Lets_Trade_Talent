@@ -1,4 +1,5 @@
 const jwt = require("jsonwebtoken");
+const userModel = require("../Models/User");
 
 const LoggedInOnly = (req, res, next) => {
   try {
@@ -18,15 +19,21 @@ const LoggedInOnly = (req, res, next) => {
       });
     }
 
-    jwt.verify(token, process.env.SECRET, (err, decoded) => {
+    jwt.verify(token, process.env.SECRET, async (err, decoded) => {
       if (err) {
         return res.status(403).json({
           message: "Invalid or expired token",
           success: false,
         });
       }
-
-      req.user = decoded;
+      const user = await userModel.findById(decoded._id).select("-password");
+      if (!user) {
+        return res.status(404).json({
+          message: "User not found",
+          success: false,
+        });
+      }
+      req.user = user;
       next();
     });
   } catch (err) {

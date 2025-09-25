@@ -13,12 +13,7 @@ const addProject = async (req, res) => {
             });
         }
 
-        // Debug logs
-        console.log('userId received:', userId);
-
         const user = await UserModel.findById(userId);
-        
-        console.log('user found:', user);
 
         if (!user) {
             return res.status(404).json({

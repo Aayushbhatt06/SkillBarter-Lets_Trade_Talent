@@ -48,7 +48,6 @@ const HomePage = () => {
   return (
     <div className="bg-gray-300 min-h-[97vh]">
       <div className="container mx-auto flex max-w-7xl">
-        {/* Left Sidebar */}
         <div className="w-64 bg-white h-screen sticky top-0 border-r border-gray-200 p-4">
           <nav className="space-y-2">
             <Link
@@ -97,8 +96,8 @@ const HomePage = () => {
           <div className="space-y-6">
             {posts.map((post) => (
               <PostCard
-                
                 key={post._id}
+                setPosts={setPosts}
                 post={post}
                 navigate={navigate}
                 timeAgo={timeAgo}
