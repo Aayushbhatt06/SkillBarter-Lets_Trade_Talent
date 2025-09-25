@@ -1,11 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Home, MessageSquare, User, Settings } from "lucide-react";
+import { useDispatch } from "react-redux";
+import { login } from "../Redux/userSlice";
 import InstantPost from "./InstantPost";
 import PostCard from "./PostCard";
 
 const HomePage = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [posts, setPosts] = useState([]);
 
   const timeAgo = (dateString) => {
@@ -42,12 +45,40 @@ const HomePage = () => {
   };
 
   useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/profile`, {
+          method: "GET",
+          credentials: "include",
+        });
+        if (!res.ok) throw new Error("Failed to fetch user");
+        const data = await res.json();
+
+        const userPayload = {
+          id: data.user._id,
+          name: data.user.name,
+          email: data.user.email,
+          image: data.user.image,
+          skills: data.user.skills || [],
+        };
+
+        dispatch(login(userPayload));
+      } catch (err) {
+        console.error("User fetch error:", err);
+      }
+    };
+
+    fetchUser();
+  }, [dispatch]);
+
+  useEffect(() => {
     fetchPosts();
   }, []);
 
   return (
     <div className="bg-gray-300 min-h-[97vh]">
       <div className="container mx-auto flex max-w-7xl">
+        {/* Sidebar */}
         <div className="w-64 bg-white h-screen sticky top-0 border-r border-gray-200 p-4">
           <nav className="space-y-2">
             <Link
@@ -90,8 +121,9 @@ const HomePage = () => {
           </div>
         </div>
 
+        {/* Feed */}
         <div className="flex-1 px-6 py-4 max-w-2xl">
-          <InstantPost />
+          <InstantPost setPosts={setPosts} />
 
           <div className="space-y-6">
             {posts.map((post) => (

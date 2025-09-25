@@ -1,54 +1,79 @@
 const postModel = require("../Models/posts");
 const userModel = require("../Models/User");
+const Like = require("../Models/Like");
+const Comment = require("../Models/Comments");
+const { uploadToCloudinary } = require("../utils/cloudinary");
+const mongoose = require("mongoose");
 
 const addPost = async (req, res) => {
   try {
-    const { title, desc, image } = req.body;
-    const userId = req.user._id;
+    const { title, desc } = req.body;
+    const user = req.user;
+
     if (!title || !desc) {
-      return res.status(401).json({
-        message: "title, description are compulsory",
-        success: true,
+      return res.status(400).json({
+        message: "Title and description are required",
+        success: false,
       });
     }
-    if (!image) {
-      image = null;
+
+    let url;
+    if (req.file) {
+      const localFilePath = req.file.path;
+      const result = await uploadToCloudinary(localFilePath);
+      if (!result) {
+        return res.status(500).json({ error: "Upload failed" });
+      }
+      url = result.secure_url;
     }
+
     const post = new postModel({
       username: user.name,
       pic: user.image,
       title,
       desc,
-      image,
+      image: url || null,
       userId: user._id,
+      like: 0,
       createdAt: new Date(),
     });
 
     await post.save();
+
     return res.status(200).json({
-      message: "Post added Successfully",
+      message: "Post added successfully",
       success: true,
+      post,
     });
   } catch (err) {
     return res.status(500).json({
       message: "Server not responding",
       success: false,
+      error: err.message,
     });
   }
 };
 
 const fetchPosts = async (req, res) => {
   try {
-    let limit = 20;
+    const limit = 20;
 
-    const randomPosts = await postModel.aggregate([
+    const posts = await postModel.aggregate([
       { $sample: { size: limit } },
+      {
+        $lookup: {
+          from: "comments",
+          localField: "_id",
+          foreignField: "postId",
+          as: "comments",
+        },
+      },
     ]);
 
-    res.json({ success: true, posts: randomPosts });
+    res.json({ success: true, posts });
   } catch (err) {
     res.status(500).json({
-      message: "server not responding",
+      message: "Server not responding",
       success: false,
       error: err.message,
     });
@@ -67,34 +92,31 @@ const addComment = async (req, res) => {
       });
     }
 
-    // Push new comment into the comments array
-    const updatedPost = await postModel.findByIdAndUpdate(
-      postId,
-      {
-        $push: {
-          comments: {
-            username: user.name,
-            pic: user.image,
-            text: comment,
-            userId: user._id,
-            createdAt: new Date(),
-          },
-        },
-      },
-      { new: true } // return updated post
-    );
-
-    if (!updatedPost) {
+    const post = await postModel.findById(postId);
+    if (!post) {
       return res.status(404).json({
         message: "Post not found",
         success: false,
       });
     }
 
+    const newComment = await Comment.create({
+      postId,
+      userId: user._id,
+      username: user.name,
+      text: comment,
+      pic: user.image,
+    });
+
+    const comments = await Comment.find({ postId }).sort({ createdAt: -1 });
+
     return res.status(200).json({
       message: "Comment added successfully",
       success: true,
-      post: updatedPost,
+      post: {
+        ...post.toObject(),
+        comments,
+      },
     });
   } catch (err) {
     return res.status(500).json({
@@ -111,62 +133,50 @@ const like = async (req, res) => {
     const { postId } = req.body;
 
     if (!postId) {
-      return res.status(400).json({
-        message: "Post Id is required",
-        success: false,
-      });
+      return res
+        .status(400)
+        .json({ message: "Post Id is required", success: false });
     }
-    const user = await userModel.findById(userId);
+
     const post = await postModel.findById(postId);
-
     if (!post) {
-      return res.status(404).json({
-        message: "Post no longer available",
-        success: false,
-      });
-    }
-    if (!user) {
-      return res.status(404).json({
-        message: "User not found",
-        success: false,
-      });
+      return res
+        .status(404)
+        .json({ message: "Post not found", success: false });
     }
 
-    if (post.likes.some((id) => id.toString() === userId.toString())) {
-      // Remove like
-      user.likedPosts = user.likedPosts.filter(
-        (id) => id.toString() !== postId.toString()
-      );
-      post.likes = post.likes.filter(
-        (id) => id.toString() !== userId.toString()
-      );
+    const existingLike = await Like.findOne({ userId, postId });
 
-      await Promise.all([user.save(), post.save()]);
-
-      return res.status(200).json({
-        message: "Like removed",
-        success: true,
-        updatedPost: post,
-      });
+    if (existingLike) {
+      await existingLike.deleteOne();
+      post.like = Math.max(post.like - 1, 0);
+    } else {
+      await Like.create({ userId, postId });
+      post.like += 1;
     }
 
-    user.likedPosts.push(postId);
-
-    post.likes.push(userId);
     await post.save();
-    await user.save();
+
+    const updatedPost = await postModel.aggregate([
+      { $match: { _id: new mongoose.Types.ObjectId(postId) } },
+      {
+        $lookup: {
+          from: "comments",
+          localField: "_id",
+          foreignField: "postId",
+          as: "comments",
+        },
+      },
+    ]);
 
     return res.status(200).json({
-      message: "Like added successfully",
+      message: existingLike ? "Like removed" : "Like added successfully",
       success: true,
-      updatedPost: post,
+      updatedPost: updatedPost[0],
     });
   } catch (err) {
     console.error("Like error:", err);
-    return res.status(500).json({
-      message: "Server not responding",
-      success: false,
-    });
+    return res.status(500).json({ message: "Server error", success: false });
   }
 };
 

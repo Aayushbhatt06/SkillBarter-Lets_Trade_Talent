@@ -7,7 +7,12 @@ const AuthRouter = require("./Routes/AuthRouter");
 const ApiRouter = require("./Routes/ApiRouter");
 const cookieParser = require("cookie-parser");
 const profileRouter = require("./Routes/profileRoutes");
-
+app.use(
+  cors({
+    origin: "http://localhost:5173",
+    credentials: true,
+  })
+);
 require("dotenv").config();
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
@@ -22,12 +27,7 @@ app.get("/", (req, res) => {
 });
 
 app.use(bodyParser.json());
-app.use(
-  cors({
-    origin: "http://localhost:5173",
-    credentials: true,
-  })
-);
+
 app.use(cookieParser());
 app.use("/auth", AuthRouter);
 app.use("/api", ApiRouter);

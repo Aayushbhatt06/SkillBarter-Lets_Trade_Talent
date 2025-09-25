@@ -17,7 +17,7 @@ const projectSchema = new mongoose.Schema({
   },
   fulfilled: {
     type: Boolean,
-    default: false  //false = live, true = completed
+    default: false
   },
   userId: {
     type: mongoose.Schema.Types.ObjectId,

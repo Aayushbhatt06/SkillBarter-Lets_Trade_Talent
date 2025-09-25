@@ -136,8 +136,10 @@ const Navbar = () => {
         <div className="flex items-center gap-2 md:w-1/4 md:min-w-[220px]">
           <div className="heading flex gap-0 justify-items-start">
             <h6
-              onClick={() => {}}
-              className="truncate ml-2 mt-2 !text-[16px] font-semibold text-white"
+              onClick={() => {
+                navigate("/");
+              }}
+              className="truncate ml-2 mt-2 !text-[16px] cursor-pointer font-semibold text-white"
             >
               SkillBarter :{" "}
             </h6>

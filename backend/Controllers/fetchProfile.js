@@ -6,8 +6,7 @@ const fetchProfile = async (req, res) => {
   try {
     const userId = req.user._id;
 
-    // Fetch user
-    const user = await UserModel.findOne({ _id: userId }).select("-password");
+    const user = await UserModel.findById(userId).select("-password");
     if (!user) {
       return res.status(404).json({
         success: false,
@@ -15,17 +14,19 @@ const fetchProfile = async (req, res) => {
       });
     }
 
-    // Fetch posts and projects
-    const posts = await postModel.find({ userId }).lean(); // convert to plain JS objects
-    const projects = await projectModel.find({ userId }).lean();
+    const posts = await postModel.find({ userId }).sort({ createdAt: -1 });
+    const projects = await projectModel
+      .find({ userId })
+      .sort({ createdAt: -1 });
 
     return res.json({
       success: true,
-      user: user.toObject(), // convert Mongoose doc to plain JS object
+      user: user.toObject(),
       posts,
       projects,
     });
   } catch (error) {
+    console.error(error);
     return res.status(500).json({
       success: false,
       message: "Something went wrong",

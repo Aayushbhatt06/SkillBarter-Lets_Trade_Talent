@@ -4,11 +4,12 @@ import { useSelector } from "react-redux";
 
 const defImg = "image.png";
 
-const InstantPost = () => {
+const InstantPost = ({ setPosts }) => {
   const [title, setTitle] = useState("");
   const [desc, setDesc] = useState("");
   const [image, setImage] = useState("");
   const [file, setFile] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   const user = useSelector((state) => state.user);
   const fileInputRef = useRef(null);
@@ -28,6 +29,7 @@ const InstantPost = () => {
   };
 
   const handleSubmit = async (e) => {
+    setLoading(true);
     e.preventDefault();
 
     const formData = new FormData();
@@ -40,14 +42,20 @@ const InstantPost = () => {
       const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/post`, {
         method: "POST",
         credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-        },
         body: formData,
       });
       if (!res.ok) {
         alert("error");
       }
+      const data = await res.json();
+      setPosts(...posts, data.post);
+      setTitle("");
+      setDesc("");
+      setImage("");
+      setFile(null);
+      setLoading(false);
+
+      // window.location.reload();
     } catch (error) {}
   };
 
