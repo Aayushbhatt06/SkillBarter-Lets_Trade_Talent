@@ -153,7 +153,7 @@ const PostCard = ({ post, navigate, timeAgo, setPosts }) => {
 
         <div className="flex items-center space-x-2 mt-3">
           <img
-            src={defImg}
+            src={user.image || defImg}
             alt="Your avatar"
             className="w-8 h-8 rounded-full"
           />

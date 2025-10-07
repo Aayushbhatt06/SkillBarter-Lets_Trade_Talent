@@ -29,9 +29,8 @@ const InstantPost = ({ setPosts }) => {
   };
 
   const handleSubmit = async (e) => {
-    setLoading(true);
     e.preventDefault();
-
+    setLoading(true);
     const formData = new FormData();
     formData.append("title", title);
     formData.append("desc", desc);
@@ -46,17 +45,22 @@ const InstantPost = ({ setPosts }) => {
       });
       if (!res.ok) {
         alert("error");
+        return;
       }
       const data = await res.json();
-      setPosts(...posts, data.post);
+      setPosts((prevPosts) => [data.post, ...prevPosts]);
       setTitle("");
       setDesc("");
       setImage("");
       setFile(null);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
+    } catch (error) {
+      console.error(error);
+    } finally {
       setLoading(false);
-
-      // window.location.reload();
-    } catch (error) {}
+    }
   };
 
   return (
