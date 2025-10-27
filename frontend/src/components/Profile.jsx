@@ -57,9 +57,9 @@ const Profile = () => {
   };
 
   return (
-    <div className="bg bg-gray-300 min-h-screen mt-0">
-      <div className="flex flex-col bg-white items-center  w-full max-w-3xl mx-auto mt-10 p-4 relative">
-        <div className="flex flex-col md:flex-row w-full items-center md:items-start md:space-x-8">
+    <div className="bg rounded-lg min-h-screen mt-0">
+      <div className="flex flex-col rounded-xl ml-5 min-w-[80vw] min-h-screen bg-white w-full max-w-3xl  mt-3 p-4 relative">
+        <div className="flex flex-col md:flex-row w-full md:items-start md:space-x-8">
           <div className="flex-shrink-0">
             {image ? (
               <img

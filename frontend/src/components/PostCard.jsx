@@ -113,7 +113,7 @@ const PostCard = ({ post, navigate, timeAgo, setPosts }) => {
           <img
             src={post.image}
             alt="Post content"
-            className="w-full h-64 object-cover"
+            className="w-full h-100 object-cover"
           />
         </div>
       )}
