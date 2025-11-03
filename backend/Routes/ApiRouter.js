@@ -1,7 +1,9 @@
 const router = require("express").Router();
 const { addSkills, findUserSk } = require("../Controllers/addSkill.js");
 const LoggedInOnly = require("../Middlewares/LoggedInOnly.js");
+const fetchProjects = require("../Controllers/fetchProject.js");
 const {
+  fetchSinglePost,
   addPost,
   fetchPosts,
   addComment,
@@ -21,4 +23,6 @@ router.post("/comment", LoggedInOnly, addComment);
 router.post("/like", LoggedInOnly, like);
 router.get("/skillproject", projectSkills);
 router.get("/tagline", getTagLines);
+router.post("/fetchproject", LoggedInOnly, fetchProjects);
+router.post("/load-post", LoggedInOnly, fetchSinglePost);
 module.exports = router;

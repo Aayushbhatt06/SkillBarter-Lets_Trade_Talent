@@ -9,9 +9,12 @@ const HomePage = () => {
   const [posts, setPosts] = useState([]);
   const fetchPosts = async () => {
     try {
-      const res = await fetch("http://localhost:8080/api/fetchposts", {
-        method: "GET",
-      });
+      const res = await fetch(
+        `${import.meta.env.VITE_BACKEND_URL}/api/fetchposts`,
+        {
+          method: "GET",
+        }
+      );
       if (!res.ok) {
         alert("unable to fetch posts");
       }

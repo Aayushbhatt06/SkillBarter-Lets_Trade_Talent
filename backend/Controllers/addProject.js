@@ -35,6 +35,8 @@ const addProject = async (req, res) => {
 
     const newProj = new projectModel({
       userId,
+      username: user.name,
+      profilePic: user.image || null,
       name,
       image: url || null,
       requiredSkills,

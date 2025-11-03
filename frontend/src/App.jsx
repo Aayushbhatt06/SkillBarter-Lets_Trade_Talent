@@ -8,6 +8,7 @@ import Profile from "./components/Profile";
 import EditProfile from "./components/EditProfile";
 import NewProject from "./components/NewProject";
 import Sidebar from "./components/Sidebar";
+import Post from "./components/Post";
 
 const Layout = () => {
   return (
@@ -40,6 +41,7 @@ const router = createBrowserRouter([
       { path: "/profile", element: <Profile /> },
       { path: "/profile/edit", element: <EditProfile /> },
       { path: "/newproject", element: <NewProject /> },
+      { path: "/load-post", element: <Post /> },
     ],
   },
 ]);

@@ -6,11 +6,19 @@ const projectSchema = new mongoose.Schema({
     required: true,
     trim: true,
   },
+  username: {
+    type: String,
+    required: true,
+  },
   requiredSkills: {
     type: [String],
     required: true,
   },
   image: {
+    //project image
+    type: String,
+  },
+  profilePic: {
     type: String,
   },
   description: {

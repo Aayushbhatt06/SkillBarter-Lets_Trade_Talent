@@ -17,7 +17,7 @@ const Profile = () => {
 
   const fetchProfileData = async () => {
     try {
-      const res = await fetch("http://localhost:8080/profile", {
+      const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/profile`, {
         method: "GET",
         credentials: "include",
       });

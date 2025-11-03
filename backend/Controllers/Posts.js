@@ -179,8 +179,34 @@ const like = async (req, res) => {
     return res.status(500).json({ message: "Server error", success: false });
   }
 };
+const fetchSinglePost = async (req, res) => {
+  try {
+    const { postId } = req.body;
+    const post = await postModel.findById(postId);
+    if (!post) {
+      return res.status(404).json({
+        message: "Post Not Found",
+        status: false,
+      });
+    }
+    const comments = await Comment.find({ postId }).sort({ createdAt: -1 });
+    return res.status(200).json({
+      message: "Post Fetched Succesfully",
+      status: true,
+      post: post,
+      comments,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      message: "Something Went Wrong",
+      status: false,
+    });
+  }
+};
 
 module.exports = {
+  fetchSinglePost,
   addPost,
   fetchPosts,
   addComment,

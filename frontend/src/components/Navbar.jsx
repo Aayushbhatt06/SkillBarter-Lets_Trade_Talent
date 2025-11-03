@@ -23,11 +23,14 @@ const Navbar = () => {
     e.preventDefault();
     try {
       const search = searchInput.trim().split(" ");
-      const res = await fetch("http://localhost:8080/api/findskilled", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ search }),
-      });
+      const res = await fetch(
+        `${import.meta.env.VITE_BACKEND_URL}/api/findskilled`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ search }),
+        }
+      );
       const data = await res.json();
       if (data.success) {
         console.log(data);
@@ -89,8 +92,6 @@ const Navbar = () => {
         return;
       }
       setTags(list);
-
-      // Start typing a random tagline immediately after fetch success
       const firstIdx = nextRandomIndex(list.length);
       typeText(list[firstIdx] || DEFAULT);
     } catch {
@@ -102,13 +103,11 @@ const Navbar = () => {
     isMounted.current = true;
     getTag();
 
-    // Cycle clears and triggers the next random tagline
     const cycleMs = 6000;
     cycleRef.current = setInterval(() => {
       clearTyping();
       const list = tags && tags.length ? tags : [DEFAULT];
       const idx = nextRandomIndex(list.length);
-      // small timeout ensures previous interval fully cleared
       setTimeout(() => typeText(list[idx] || DEFAULT), 100);
     }, cycleMs);
 
@@ -117,8 +116,6 @@ const Navbar = () => {
       clearTyping();
       if (cycleRef.current) clearInterval(cycleRef.current);
     };
-    // Depend on tags length so the cycle can use fetched data once available,
-    // but not retrigger on every tagline character update.
   }, [tags.length]);
 
   const handleLogout = async () => {

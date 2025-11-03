@@ -12,10 +12,13 @@ const ProtectedRoute = ({ children }) => {
 
     const verify = async () => {
       try {
-        const res = await fetch("http://localhost:8080/auth/check", {
-          method: "GET",
-          credentials: "include",
-        });
+        const res = await fetch(
+          `${import.meta.env.VITE_BACKEND_URL}/auth/check`,
+          {
+            method: "GET",
+            credentials: "include",
+          }
+        );
         const data = await res.json();
         if (!cancelled) setAuth(data.success);
       } catch (err) {

@@ -73,7 +73,7 @@ const PostCard = ({ post, navigate, timeAgo, setPosts }) => {
 
   const handleShare = () => {
     navigator.clipboard.writeText(
-      `${import.meta.env.VITE_BACKEND_URL}/api/load-post?postId=${post._id}`
+      `${import.meta.env.VITE_FRONTEND_URL}/load-post?postId=${post._id}`
     );
     setShareLogo(true);
     setTimeout(() => setShareLogo(false), 5000);
@@ -108,7 +108,7 @@ const PostCard = ({ post, navigate, timeAgo, setPosts }) => {
       {post.image && (
         <div
           className="image cursor-pointer"
-          onDoubleClick={() => navigate(`/post?id=${post._id}`)}
+          onDoubleClick={() => navigate(`/load-post?postId=${post._id}`)}
         >
           <img
             src={post.image}
@@ -180,7 +180,7 @@ const PostCard = ({ post, navigate, timeAgo, setPosts }) => {
 
         {showComments && (
           <div className="commentsection flex flex-col space-y-4 mt-4">
-            {post.comments?.map((comment) => (
+            {post.comments?.map((comment) => (  
               <CommentCard
                 key={comment._id}
                 comment={comment}

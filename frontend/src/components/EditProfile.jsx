@@ -13,7 +13,7 @@ const EditProfile = () => {
 
   const fetchProfileData = async () => {
     try {
-      const res = await fetch("http://localhost:8080/profile", {
+      const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/profile`, {
         method: "GET",
         credentials: "include",
       });
@@ -68,11 +68,14 @@ const EditProfile = () => {
     }
 
     try {
-      const res = await fetch("http://localhost:8080/profile/edit", {
-        method: "POST",
-        credentials: "include", // keeps cookies/session for LoggedInOnly
-        body: formData,
-      });
+      const res = await fetch(
+        `${import.meta.env.VITE_BACKEND_URL}/profile/edit`,
+        {
+          method: "POST",
+          credentials: "include", // keeps cookies/session for LoggedInOnly
+          body: formData,
+        }
+      );
 
       if (!res.ok) {
         alert("Something went wrong while updating");
