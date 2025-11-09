@@ -116,7 +116,7 @@ const InstantPost = ({ setPosts }) => {
 
             <button
               onClick={handleSubmit}
-              className="bg-slate-600 text-white px-4 py-1 rounded-full hover:bg-slate-700"
+              className="bg-slate-600 text-white px-4 py-2 !rounded-full hover:bg-slate-700"
             >
               Post
             </button>

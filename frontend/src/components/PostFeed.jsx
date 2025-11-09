@@ -23,7 +23,7 @@ const PostFeed = ({ posts, setPosts }) => {
     return `${months} months ago`;
   };
   return (
-    <div className="flex-1 px-6 py-4 max-w-2xl">
+    <div className="flex-1 px-6 py-4 max-w-[40vw]">
       <InstantPost setPosts={setPosts} />
 
       <div className="space-y-6">
