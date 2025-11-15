@@ -1,19 +1,19 @@
 const mongoose = require("mongoose");
-const { Schema } = mongoose;
 
-const ConnectionSchema = new Schema({
-  requester: { type: Schema.Types.ObjectId, ref: "user", required: true },
-  recipient: { type: Schema.Types.ObjectId, ref: "user", required: true },
-  roomId: { type: String, required: true, unique: true },
-  status: {
-    type: String,
-    enum: ["pending", "accepted", "rejected"],
-    default: "pending",
+const connectionSchema = new mongoose.Schema(
+  {
+    users: [
+      { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+    ],
+    roomId: { type: String, required: true, unique: true, index: true },
+    fulfilled: { type: Boolean, default: false },
+    lastMessage: { type: String, default: "" },
+    lastMessageAt: { type: Date, default: Date.now },
+    unreadCounts: { type: Map, of: Number },
   },
-  createdAt: { type: Date, default: Date.now },
-});
+  { timestamps: true }
+);
 
-ConnectionSchema.index({ requester: 1, recipient: 1 }, { unique: true });   
+connectionSchema.index({ users: 1 });
 
-const Connection = mongoose.model("Connection", ConnectionSchema);
-module.exports = Connection;
+module.exports = mongoose.model("Connection", connectionSchema);
