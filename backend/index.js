@@ -7,6 +7,7 @@ const AuthRouter = require("./Routes/AuthRouter");
 const ApiRouter = require("./Routes/ApiRouter");
 const cookieParser = require("cookie-parser");
 const profileRouter = require("./Routes/profileRoutes");
+const connectionRoute = require("./Routes/connectionRoute");
 app.use(
   cors({
     origin: "http://localhost:5173",
@@ -32,6 +33,7 @@ app.use(cookieParser());
 app.use("/auth", AuthRouter);
 app.use("/api", ApiRouter);
 app.use("/profile", profileRouter);
+app.use("/connection", connectionRoute);
 
 app.listen(PORT, () => {
   console.log(`server is running on ${PORT}`);

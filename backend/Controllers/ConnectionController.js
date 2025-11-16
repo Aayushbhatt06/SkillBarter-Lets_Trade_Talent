@@ -166,4 +166,70 @@ const conAccept = async (req, res) => {
   }
 };
 
-module.exports = { conReq, conReject, conAccept };
+const fetchConReq = async (req, res) => {
+  try {
+    const userId = req.user?._id;
+    if (!userId) {
+      return res.status(400).json({
+        message: "Please Login",
+        success: false,
+      });
+    }
+
+    const connections = await connectionModel
+      .find({ users: userId, fulfilled: false })
+      .populate("users", "name")
+      .sort({ createdAt: -1 });
+
+    return res.status(200).json({
+      message: "Fetched Successfully",
+      success: true,
+      connections: connections,
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      message: "Server Error",
+      success: false,
+      error: error.message,
+    });
+  }
+};
+
+const fetchConnections = async (req, res) => {
+  try {
+    const userId = req.user?._id;
+    if (!userId) {
+      return res.status(400).json({
+        message: "Please Login",
+        success: false,
+      });
+    }
+
+    const connections = await connectionModel
+      .find({ users: userId, fulfilled: true })
+      .populate("users", "name")
+      .sort({ createdAt: -1 });
+
+    return res.status(200).json({
+      message: "Fetched Successfully",
+      success: true,
+      connections: connections,
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      message: "Server Error",
+      success: false,
+      error: error.message,
+    });
+  }
+};
+
+module.exports = {
+  conReq,
+  conReject,
+  conAccept,
+  fetchConReq,
+  fetchConnections,
+};

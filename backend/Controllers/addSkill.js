@@ -55,7 +55,7 @@ const findUserSk = async (req, res) => {
       });
     }
     if (!Array.isArray(search)) {
-      search = [search]; 
+      search = [search];
     }
 
     const users = await UserModel.find({
@@ -63,7 +63,7 @@ const findUserSk = async (req, res) => {
         { skills: { $in: search } },
         { name: { $in: search.map((word) => new RegExp(word, "i")) } },
       ],
-    }).select("name _id");
+    }).select("name _id image");
 
     if (!users || users.length === 0) {
       return res.status(200).json({
