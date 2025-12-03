@@ -222,6 +222,7 @@ const Navbar = () => {
               <Bell />
             </button>
             <button
+              type="button"
               onClick={handleLogout}
               className="bg-red-700 px-4 py-2 rounded text-white"
             >
