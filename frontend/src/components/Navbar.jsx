@@ -92,7 +92,9 @@ const Navbar = () => {
 
   const getTag = async () => {
     try {
-      const res = await fetch("http://localhost:8080/api/tagline");
+      const res = await fetch(
+        `${import.meta.env.VITE_BACKEND_URL}/api/tagline`
+      );
       if (!res.ok) {
         typeText(DEFAULT);
         return;
@@ -142,7 +144,7 @@ const Navbar = () => {
   }, [tags.length]);
 
   const handleLogout = async () => {
-    await fetch("http://localhost:8080/auth/logout", {
+    await fetch(`${import.meta.env.VITE_BACKEND_URL}/auth/logout`, {
       method: "POST",
       credentials: "include",
     });
