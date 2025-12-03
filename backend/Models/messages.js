@@ -16,7 +16,7 @@ const messageSchema = new mongoose.Schema(
       required: true,
     },
     readBy: {
-      readBy: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+      readBy: { type: Boolean, default: false },
     },
   },
   {

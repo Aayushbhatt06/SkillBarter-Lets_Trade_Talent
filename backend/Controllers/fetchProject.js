@@ -24,15 +24,24 @@ const fetchProjects = async (req, res) => {
           requiredSkills: { $in: skills },
           _id: { $nin: presentProjects },
         })
+        .populate("userId", "name email image skills")
         .limit(10);
     }
 
     const remaining = 10 - Skprojects.length;
+
     if (remaining > 0) {
-      Rnprojects = await projectDB.aggregate([
-        { $match: { _id: { $nin: presentProjects } } },
+      const excludeIds = [...presentProjects, ...Skprojects.map((p) => p._id)];
+
+      const docs = await projectDB.aggregate([
+        { $match: { _id: { $nin: excludeIds } } },
         { $sample: { size: remaining } },
       ]);
+
+      Rnprojects = await projectDB.populate(docs, {
+        path: "userId",
+        select: "name email image skills",
+      });
     }
 
     const projects = [...Skprojects, ...Rnprojects];

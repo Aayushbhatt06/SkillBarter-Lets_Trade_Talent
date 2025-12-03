@@ -84,9 +84,9 @@ const Post = () => {
         return;
       }
 
-      setUserId(data.post.userId);
-      setUserName(data.post.username);
-      setProfilePic(data.post.pic);
+      setUserId(data.post.userId._id);
+      setUserName(data.post.userId.name);
+      setProfilePic(data.post.userId.image);
       setTitle(data.post.title);
       setDesc(data.post.desc);
       setImage(data.post.image);

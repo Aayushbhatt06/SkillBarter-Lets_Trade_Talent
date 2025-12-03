@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Menu, Search } from "lucide-react";
+import { Menu, Search, Bell } from "lucide-react";
 import { useDispatch } from "react-redux";
 import { logout } from "../Redux/userSlice";
 import { useNavigate } from "react-router-dom";
@@ -22,18 +22,24 @@ const Navbar = () => {
   const handelOnChange = (e) => setSearch(e.target.value);
 
   useEffect(() => {
-    setIsSearching(searchRes.length > 0);
-  }, [searchRes]);
+    const query = searchInput.trim();
 
-  useEffect(() => {
-    if (!searchInput.trim()) {
+    if (query.length <= 2) {
       setSearchRes([]);
+      setIsSearching(false);
+      return;
     }
+
+    setIsSearching(true);
+
+    const timer = setTimeout(() => {
+      runSearch();
+    }, 400);
+
+    return () => clearTimeout(timer);
   }, [searchInput]);
 
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const runSearch = async () => {
     try {
       const search = searchInput.trim().split(" ");
       const res = await fetch(
@@ -46,7 +52,6 @@ const Navbar = () => {
       );
       const data = await res.json();
       if (data.success) {
-        console.log(data);
         setSearchRes(data.users || []);
       } else {
         setSearchRes([]);
@@ -56,7 +61,6 @@ const Navbar = () => {
       setSearchRes([]);
     }
   };
-
   const clearTyping = () => {
     if (typingRef.current) {
       clearInterval(typingRef.current);
@@ -150,11 +154,24 @@ const Navbar = () => {
     <>
       <div
         className={`users ${
-          isSearching ? "flex" : "hidden"
-        } fixed left-0 top-16 w-full max-h-[300px] overflow-y-auto z-50 bg-white shadow-lg border rounded-md`}
+          searchInput.length > 2 ? "flex" : "hidden"
+        } fixed flex flex-col justify-center 
+     left-1/2 -translate-x-1/2  /* <-- Centers horizontally */
+     top-16 w-[30vw] max-h-screen overflow-y-auto 
+     z-50 bg-white shadow-lg border rounded-md`}
       >
         {searchRes.map((res) => (
-          <div key={res._id} className="p-3 hover:bg-gray-100 cursor-pointer">
+          <div
+            key={res._id}
+            className="p-3 flex hover:bg-gray-100 gap-3 cursor-pointer"
+          >
+            <div className="img">
+              <img
+                className="w-10 h-10 rounded-full"
+                src={res.image || "image.png"}
+                alt=""
+              />
+            </div>
             {res.name}
           </div>
         ))}
@@ -163,6 +180,7 @@ const Navbar = () => {
       <header className="bg-slate-800">
         <div className="mx-auto flex flex-col gap-2 px-4 py-2 md:flex-row md:items-center md:justify-between">
           <div className="flex items-center gap-2 md:w-1/4 md:min-w-[220px]">
+            <Menu className="text-white md:hidden" />
             <div className="heading flex gap-0 justify-items-start">
               <h6
                 onClick={() => {
@@ -179,7 +197,7 @@ const Navbar = () => {
           </div>
 
           <div className="w-full md:w-1/2 md:max-w-2xl md:px-2">
-            <form onSubmit={handleSubmit} className="relative" role="search">
+            <div className="relative" role="search">
               <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-slate-600">
                 <Search size={18} />
               </span>
@@ -189,21 +207,20 @@ const Navbar = () => {
                 value={searchInput}
                 type="search"
                 placeholder="Search skills, people, or tags"
-                className="w-full rounded-full bg-white/90 pl-12 pr-28 py-2.5 text-sm text-slate-800 placeholder:text-slate-500 shadow-sm
-              focus:outline-none focus:ring-2 focus:ring-white-300"
+                className="w-full rounded-full bg-white/90 pl-12 pr-4 py-2.5 text-sm text-slate-800 placeholder:text-slate-500 shadow-sm focus:outline-none focus:ring-2 focus:ring-white-300"
               />
-
-              <button
-                type="submit"
-                className="absolute right-0 top-1/2 -translate-y-1/2  bg-amber-700 px-4 py-2.5 text-sm font-medium text-white
-              hover:bg-amber-600 active:bg-amber-700 border border-amber-800/10 shadow-sm !rounded-r-full"
-              >
-                Search
-              </button>
-            </form>
+            </div>
           </div>
 
           <div className="flex items-center justify-end gap-3 md:w-1/4 md:min-w-[180px]">
+            <button
+              className="text-white"
+              onClick={() => {
+                navigate("/notification");
+              }}
+            >
+              <Bell />
+            </button>
             <button
               onClick={handleLogout}
               className="bg-red-700 px-4 py-2 rounded text-white"

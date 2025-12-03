@@ -34,7 +34,7 @@ const Sidebar = () => {
         <h3 className="font-semibold  text-blue-800 mb-2">Messages</h3>
         <div className="search">
           <input
-            className="bg-white/20 shadow min-w-[14vw] border-[1px] text-black border-black  mr-1 rounded-sm p-2 
+            className="bg-white/20 shadow  max-w-[14vw] border-[1px] text-black border-black  mr-1 rounded-sm p-2 
             hover:bg-gray-200"
             type="text"
             placeholder="Search Connections..."

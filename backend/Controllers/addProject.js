@@ -35,22 +35,24 @@ const addProject = async (req, res) => {
 
     const newProj = new projectModel({
       userId,
-      username: user.name,
-      profilePic: user.image || null,
       name,
       image: url || null,
       requiredSkills,
       description,
       fulfilled: false,
-      createdAt: new Date(),
     });
 
     await newProj.save();
 
+    const populatedProj = await newProj.populate(
+      "userId",
+      "name email image skills"
+    );
+
     return res.status(201).json({
       success: true,
       message: "Project added successfully.",
-      data: newProj,
+      data: populatedProj,
     });
   } catch (err) {
     console.error(err);

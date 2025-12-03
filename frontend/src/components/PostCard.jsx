@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Heart, MessageCircle, Share, ClipboardCheck } from "lucide-react";
 import CommentCard from "./CommentCard";
 import { useSelector } from "react-redux";
+import { sendConnection } from "./SendConnection";
 
 const defImg = "image.png";
 
@@ -12,6 +13,19 @@ const PostCard = ({ post, navigate, timeAgo, setPosts }) => {
   const [shareLogo, setShareLogo] = useState(false);
   const [newComment, setNewComment] = useState("");
 
+  const authorId =
+    typeof post.userId === "string" ? post.userId : post.userId?._id;
+
+  const authorName =
+    (typeof post.userId === "object" && post.userId?.name) ||
+    post.username ||
+    "Anonymous";
+
+  const authorImage =
+    (typeof post.userId === "object" && post.userId?.image) ||
+    post.pic ||
+    defImg;
+
   const handleLike = async () => {
     try {
       const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/like`, {
@@ -21,18 +35,13 @@ const PostCard = ({ post, navigate, timeAgo, setPosts }) => {
         body: JSON.stringify({ postId: post._id }),
       });
 
-      if (!res.ok) {
-        console.log("Error occurred while liking the post");
-        return;
-      }
+      if (!res.ok) return;
 
       const data = await res.json();
       const updatedPost = data.updatedPost;
 
       setPosts((prevPosts) =>
-        prevPosts.map((post) =>
-          post._id === updatedPost._id ? updatedPost : post
-        )
+        prevPosts.map((p) => (p._id === updatedPost._id ? updatedPost : p))
       );
     } catch (error) {
       console.log(error);
@@ -53,10 +62,7 @@ const PostCard = ({ post, navigate, timeAgo, setPosts }) => {
         }
       );
 
-      if (!res.ok) {
-        alert("Error adding comment");
-        return;
-      }
+      if (!res.ok) return;
 
       const data = await res.json();
       const updatedPost = data.post;
@@ -67,7 +73,7 @@ const PostCard = ({ post, navigate, timeAgo, setPosts }) => {
       setNewComment("");
       setShowComments(true);
     } catch (error) {
-      alert(error);
+      console.log(error);
     }
   };
 
@@ -79,25 +85,42 @@ const PostCard = ({ post, navigate, timeAgo, setPosts }) => {
     setTimeout(() => setShareLogo(false), 5000);
   };
 
+  const handleConnection = async () => {
+    const res = await sendConnection(authorId);
+
+    if (res.ok) {
+      setButtonText("Request Sent");
+      setButtonDisabled(true);
+    } else {
+      setButtonText(res.data?.message || "Failed");
+    }
+  };
+
   return (
     <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
       <div className="p-4 flex items-center justify-between">
         <div
-          onClick={() => navigate(`/load-profile?id=${post.userId}`)}
+          onClick={() => navigate(`/load-profile?id=${authorId}`)}
           className="flex items-center cursor-pointer space-x-3"
         >
           <img
-            src={post.pic || defImg}
-            alt={`${post.username} avatar`}
+            src={authorImage}
+            alt={`${authorName} avatar`}
             className="w-10 h-10 rounded-full"
           />
           <div>
-            <h3 className="font-semibold text-gray-900">
-              {post.username || "Anonymous"}
-            </h3>
+            <h3 className="font-semibold text-gray-900">{authorName}</h3>
             <p className="text-sm text-gray-500">{timeAgo(post.createdAt)}</p>
           </div>
         </div>
+        <button
+          onClick={() => {
+            if (authorId) handleConnection(authorId);
+          }}
+          className="bg-blue-500 text-white px-3 py-1 !rounded-lg"
+        >
+          Connect
+        </button>
       </div>
 
       <div className="px-4 pb-3">
@@ -180,7 +203,7 @@ const PostCard = ({ post, navigate, timeAgo, setPosts }) => {
 
         {showComments && (
           <div className="commentsection flex flex-col space-y-4 mt-4">
-            {post.comments?.map((comment) => (  
+            {post.comments?.map((comment) => (
               <CommentCard
                 key={comment._id}
                 comment={comment}

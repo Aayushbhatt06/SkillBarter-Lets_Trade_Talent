@@ -1,6 +1,9 @@
 import React from "react";
+import { sendConnection } from "./SendConnection";
+import { useNavigate } from "react-router-dom";
 
 const ProjectCard = ({ project }) => {
+  const navigate = useNavigate();
   const timeAgo = (dateString) => {
     const date = new Date(dateString);
     const now = new Date();
@@ -22,7 +25,10 @@ const ProjectCard = ({ project }) => {
     <div className="outer min-w-[35vw] max-w-[35vw] min-h-full flex">
       <div className="inner flex flex-col mx-3 mt-4 bg-white min-w-[35vw] max-w-[35vw] min-h-full rounded-lg">
         <div className="profile flex justify-between items-center p-2">
-          <div className="imgname flex gap-3 items-center">
+          <div
+            onClick={() => navigate(`/load-profile?id=${project.userId}`)}
+            className="imgname cursor-pointer flex gap-3 items-center"
+          >
             <img
               src={project.profilePic}
               alt="profile"
@@ -33,7 +39,12 @@ const ProjectCard = ({ project }) => {
               <p>{timeAgo(project.createdAt)}</p>
             </div>
           </div>
-          <button className="bg-blue-500 text-white px-3 py-1 !rounded-lg">
+          <button
+            onClick={() => {
+              sendConnection(project.userId);
+            }}
+            className="bg-blue-500 text-white px-3 py-1 !rounded-lg"
+          >
             Connect
           </button>
         </div>

@@ -168,7 +168,8 @@ const conAccept = async (req, res) => {
 
 const fetchConReq = async (req, res) => {
   try {
-    const userId = req.user?._id;
+    const userId = req.user?._id?.toString();
+
     if (!userId) {
       return res.status(400).json({
         message: "Please Login",
@@ -177,14 +178,18 @@ const fetchConReq = async (req, res) => {
     }
 
     const connections = await connectionModel
-      .find({ users: userId, fulfilled: false })
+      .find({ fulfilled: false })
       .populate("users", "name")
       .sort({ createdAt: -1 });
+
+    const filtered = connections.filter(
+      (con) => con.users[1]?._id.toString() === userId
+    );
 
     return res.status(200).json({
       message: "Fetched Successfully",
       success: true,
-      connections: connections,
+      connections: filtered,
     });
   } catch (error) {
     console.error(error);

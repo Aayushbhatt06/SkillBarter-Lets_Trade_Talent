@@ -13,6 +13,7 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
   const navigate = useNavigate();
+  const [show, setShow] = useState(false);
 
   const handleOnChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -44,8 +45,7 @@ const Login = () => {
           token: data.jwtToken,
           image: data.data.image,
         };
-        dispatch(login(userData)); // Save to redux
-        // localStorage.setItem("token", data.jwtToken);
+        dispatch(login(userData));
         navigate("/");
       } else {
         setErrorMsg(data.message || "Login failed");
@@ -118,7 +118,7 @@ const Login = () => {
                 <div className="mt-2">
                   <input
                     id="password"
-                    type="password"
+                    type={show ? "text" : "password"}
                     name="password"
                     value={formData.password}
                     onChange={handleOnChange}

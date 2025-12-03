@@ -9,6 +9,7 @@ import EditProfile from "./components/EditProfile";
 import NewProject from "./components/NewProject";
 import Sidebar from "./components/Sidebar";
 import Post from "./components/Post";
+import Notification from "./components/Notification";
 
 const Layout = () => {
   return (
@@ -42,6 +43,7 @@ const router = createBrowserRouter([
       { path: "/profile/edit", element: <EditProfile /> },
       { path: "/newproject", element: <NewProject /> },
       { path: "/load-post", element: <Post /> },
+      { path: "/notification", element: <Notification /> },
     ],
   },
 ]);

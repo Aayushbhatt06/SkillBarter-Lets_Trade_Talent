@@ -1,5 +1,4 @@
 const postModel = require("../Models/posts");
-const userModel = require("../Models/User");
 const Like = require("../Models/Like");
 const Comment = require("../Models/Comments");
 const { uploadToCloudinary } = require("../utils/cloudinary");
@@ -28,22 +27,20 @@ const addPost = async (req, res) => {
     }
 
     const post = new postModel({
-      username: user.name,
-      pic: user.image,
       title,
       desc,
       image: url || null,
       userId: user._id,
       like: 0,
-      createdAt: new Date(),
     });
 
     await post.save();
+    const populatedPost = await post.populate("userId", "name email image");
 
     return res.status(200).json({
       message: "Post added successfully",
       success: true,
-      post,
+      post: populatedPost,
     });
   } catch (err) {
     return res.status(500).json({
@@ -58,7 +55,7 @@ const fetchPosts = async (req, res) => {
   try {
     const limit = 20;
 
-    const posts = await postModel.aggregate([
+    const postsAgg = await postModel.aggregate([
       { $sample: { size: limit } },
       {
         $lookup: {
@@ -70,9 +67,14 @@ const fetchPosts = async (req, res) => {
       },
     ]);
 
-    res.json({ success: true, posts });
+    const posts = await postModel.populate(postsAgg, {
+      path: "userId",
+      select: "name email image",
+    });
+
+    return res.status(200).json({ success: true, posts });
   } catch (err) {
-    res.status(500).json({
+    return res.status(500).json({
       message: "Server not responding",
       success: false,
       error: err.message,
@@ -100,7 +102,7 @@ const addComment = async (req, res) => {
       });
     }
 
-    const newComment = await Comment.create({
+    await Comment.create({
       postId,
       userId: user._id,
       username: user.name,
@@ -157,47 +159,49 @@ const like = async (req, res) => {
 
     await post.save();
 
-    const updatedPost = await postModel.aggregate([
-      { $match: { _id: new mongoose.Types.ObjectId(postId) } },
-      {
-        $lookup: {
-          from: "comments",
-          localField: "_id",
-          foreignField: "postId",
-          as: "comments",
-        },
-      },
-    ]);
+    const updatedPost = await postModel
+      .findById(postId)
+      .populate("userId", "name email image");
+
+    const comments = await Comment.find({ postId }).sort({ createdAt: -1 });
 
     return res.status(200).json({
       message: existingLike ? "Like removed" : "Like added successfully",
       success: true,
-      updatedPost: updatedPost[0],
+      updatedPost: {
+        ...updatedPost.toObject(),
+        comments,
+      },
     });
   } catch (err) {
-    console.error("Like error:", err);
     return res.status(500).json({ message: "Server error", success: false });
   }
 };
+
 const fetchSinglePost = async (req, res) => {
   try {
     const { postId } = req.body;
-    const post = await postModel.findById(postId);
+
+    const post = await postModel
+      .findById(postId)
+      .populate("userId", "name email image");
+
     if (!post) {
       return res.status(404).json({
         message: "Post Not Found",
         status: false,
       });
     }
+
     const comments = await Comment.find({ postId }).sort({ createdAt: -1 });
+
     return res.status(200).json({
-      message: "Post Fetched Succesfully",
+      message: "Post Fetched Successfully",
       status: true,
-      post: post,
+      post,
       comments,
     });
   } catch (error) {
-    console.log(error);
     return res.status(500).json({
       message: "Something Went Wrong",
       status: false,
