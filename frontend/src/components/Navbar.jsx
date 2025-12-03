@@ -142,12 +142,33 @@ const Navbar = () => {
   }, [tags.length]);
 
   const handleLogout = async () => {
-    await fetch(`${import.meta.env.VITE_BACKEND_URL}/auth/logout`, {
-      method: "POST",
-      credentials: "include",
-    });
-    dispatch(logout());
-    // window.location.reload();
+    try {
+      const res = await fetch(
+        `${import.meta.env.VITE_BACKEND_URL}/auth/logout`,
+        {
+          method: "POST",
+          credentials: "include",
+        }
+      );
+
+      let data = null;
+      try {
+        data = await res.json();
+      } catch {
+        data = null;
+      }
+
+      console.log("LOGOUT response:", res.status, data);
+
+      if (!res.ok) {
+        // don't dispatch if backend logout failed
+        return;
+      }
+
+      dispatch(logout());
+    } catch (err) {
+      console.error("LOGOUT network error:", err);
+    }
   };
 
   return (
