@@ -15,7 +15,7 @@ const server = http.createServer(app);
 initializeSocket(server);
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: ["http://localhost:5173", "https://skillmate-plum.vercel.app"],
     credentials: true,
   })
 );
