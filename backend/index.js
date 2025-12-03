@@ -19,6 +19,7 @@ app.use(
     credentials: true,
   })
 );
+app.use(cookieParser());
 require("dotenv").config();
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
@@ -34,7 +35,6 @@ app.get("/", (req, res) => {
 
 app.use(bodyParser.json());
 
-app.use(cookieParser());
 app.use("/auth", AuthRouter);
 app.use("/api", ApiRouter);
 app.use("/profile", profileRouter);
