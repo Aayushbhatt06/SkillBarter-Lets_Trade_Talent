@@ -35,15 +35,21 @@ const Notification = () => {
         credentials: "include",
         body: JSON.stringify({ conId: id }),
       });
+
       const data = await res.json();
+
       if (!res.ok) {
         setError(true);
-        setMessage(data.message);
+        setMessage(data.message || "Something went wrong while accepting");
+        return;
       }
+
+      setError(false);
+      setMessage(data.message || "Request accepted successfully");
       fetchReq();
     } catch (err) {
-      setMessage(err);
       setError(true);
+      setMessage(err.message || "Network error");
     }
   };
 
@@ -57,15 +63,20 @@ const Notification = () => {
         credentials: "include",
         body: JSON.stringify({ conId: id }),
       });
+
       const data = await res.json();
+
       if (!res.ok) {
         setError(true);
-        setMessage(data.message);
+        setMessage(data.message || "Something went wrong while rejecting");
+        return;
       }
+      setError(false);
+      setMessage(data.message || "Request rejected successfully");
       fetchReq();
     } catch (err) {
-      setMessage(err);
       setError(true);
+      setMessage(err.message || "Network error");
     }
   };
 
@@ -82,13 +93,20 @@ const Notification = () => {
 
   return (
     <>
-      <div
-        className={` p-4 bg-red-500 max-w-[76vw] min-w-[76vw] rounded-lg mx-4 ${
-          error ? `absolute` : `hidden`
-        }`}
-      >
-        <div className="message text-white text-xl">{message}</div>
-      </div>
+      {message && (
+        <div
+          className={`
+      fixed bottom-6 right-6 z-50
+      px-5 py-3 rounded-xl shadow-lg
+      text-white font-semibold text-sm
+      backdrop-blur-md 
+      animate-bounce
+      ${error ? "bg-red-500/80" : "bg-green-500/80"}
+    `}
+        >
+          {message}
+        </div>
+      )}
       <div className=" bg-white mx-4 my-3 flex flex-col min-w-[76vw] max-w-[76vw] rounded-2xl mx-10px min-h-[95vh]">
         <div className="requests text-lg mx-3 my-3">
           <h3 className="">Pending Requests : </h3>

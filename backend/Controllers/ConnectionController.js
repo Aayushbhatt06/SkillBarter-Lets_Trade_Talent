@@ -35,12 +35,12 @@ const conReq = async (req, res) => {
 
     if (existing) {
       if (existing.fulfilled) {
-        return res.status(200).json({
+        return res.status(208).json({
           message: "Already connected",
           success: true,
         });
       } else {
-        return res.status(200).json({
+        return res.status(409).json({
           message: "Request already pending",
           success: false,
         });

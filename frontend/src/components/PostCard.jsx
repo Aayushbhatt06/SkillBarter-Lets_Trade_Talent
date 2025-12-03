@@ -2,11 +2,10 @@ import React, { useState } from "react";
 import { Heart, MessageCircle, Share, ClipboardCheck } from "lucide-react";
 import CommentCard from "./CommentCard";
 import { useSelector } from "react-redux";
-import { sendConnection } from "./SendConnection";
 
 const defImg = "image.png";
 
-const PostCard = ({ post, navigate, timeAgo, setPosts }) => {
+const PostCard = ({ post, navigate, timeAgo, setPosts, onConnect }) => {
   const user = useSelector((state) => state.user);
 
   const [showComments, setShowComments] = useState(false);
@@ -85,17 +84,6 @@ const PostCard = ({ post, navigate, timeAgo, setPosts }) => {
     setTimeout(() => setShareLogo(false), 5000);
   };
 
-  const handleConnection = async () => {
-    const res = await sendConnection(authorId);
-
-    if (res.ok) {
-      setButtonText("Request Sent");
-      setButtonDisabled(true);
-    } else {
-      setButtonText(res.data?.message || "Failed");
-    }
-  };
-
   return (
     <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
       <div className="p-4 flex items-center justify-between">
@@ -115,7 +103,7 @@ const PostCard = ({ post, navigate, timeAgo, setPosts }) => {
         </div>
         <button
           onClick={() => {
-            if (authorId) handleConnection(authorId);
+            if (authorId && onConnect) onConnect(authorId);
           }}
           className="bg-blue-500 text-white px-3 py-1 !rounded-lg"
         >

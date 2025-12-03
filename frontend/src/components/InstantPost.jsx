@@ -10,6 +10,8 @@ const InstantPost = ({ setPosts }) => {
   const [image, setImage] = useState("");
   const [file, setFile] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(false);
+  const [message, setMessage] = useState("");
 
   const user = useSelector((state) => state.user);
   const fileInputRef = useRef(null);
@@ -43,11 +45,14 @@ const InstantPost = ({ setPosts }) => {
         credentials: "include",
         body: formData,
       });
+      const data = await res.json();
       if (!res.ok) {
-        alert("error");
+        setMessage(data.message);
+        setError(true);
+
         return;
       }
-      const data = await res.json();
+
       setPosts((prevPosts) => [data.post, ...prevPosts]);
       setTitle("");
       setDesc("");
@@ -56,10 +61,18 @@ const InstantPost = ({ setPosts }) => {
       if (fileInputRef.current) {
         fileInputRef.current.value = "";
       }
-    } catch (error) {
+      setMessage(data.message);
+      setError(false);
+    } catch (err) {
       console.error(error);
+      setMessage(err);
+      setError(true);
     } finally {
       setLoading(false);
+      setTimeout(() => {
+        setError(false);
+        setMessage("");
+      }, 4000);
     }
   };
 
@@ -73,6 +86,20 @@ const InstantPost = ({ setPosts }) => {
         <img className="w-20 h-20" src="Spinner.gif" alt="Loading..." />
         <p className="text-gray-700 mt-2 font-semibold">Loading...</p>
       </div>
+      {message && (
+        <div
+          className={`
+      fixed bottom-6 right-6 z-50
+      px-5 py-3 rounded-xl shadow-lg
+      text-white font-semibold text-sm
+      backdrop-blur-md 
+      animate-bounce
+      ${error ? "bg-red-500/80" : "bg-green-500/80"}
+    `}
+        >
+          {message}
+        </div>
+      )}
       <div className="mb-6">
         <div className="bg-white rounded-lg border border-gray-200 p-4">
           <div className="flex items-center space-x-3 mb-3">

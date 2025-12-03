@@ -28,19 +28,14 @@ const PostFeed = ({ posts, setPosts }) => {
   };
 
   const handleConnection = async (receiverId) => {
-    try {
-      const res = await sendConnection(receiverId);
+    const res = await sendConnection(receiverId);
 
-      if (res.ok) {
-        setError(false);
-        setMessage(res.data?.message || "Connection request sent");
-      } else {
-        setError(true);
-        setMessage(res.data?.message || "Failed to send request");
-      }
-    } catch (err) {
+    if (!res.ok || res.data.success === false) {
       setError(true);
-      setMessage("Something went wrong");
+      setMessage(res.data?.message || "Something went wrong");
+    } else {
+      setError(false);
+      setMessage(res.data?.message || "Request Sent Successfully");
     }
 
     setTimeout(() => {
@@ -52,14 +47,17 @@ const PostFeed = ({ posts, setPosts }) => {
   return (
     <>
       {message && (
-        <div className="status flex">
-          <div
-            className={`${
-              error ? "bg-red-400" : "bg-green-400"
-            } text-white p-4 w-full h-[10vh] mx-5 mt-3 rounded-xl flex items-center justify-center font-semibold transition-all`}
-          >
-            {message}
-          </div>
+        <div
+          className={`
+      fixed bottom-6 right-6 z-50
+      px-5 py-3 rounded-xl shadow-lg
+      text-white font-semibold text-sm
+      backdrop-blur-md 
+      animate-bounce
+      ${error ? "bg-red-500/80" : "bg-green-500/80"}
+    `}
+        >
+          {message}
         </div>
       )}
 
