@@ -147,7 +147,7 @@ const Navbar = () => {
       credentials: "include",
     });
     dispatch(logout());
-    window.location.reload();
+    // window.location.reload();
   };
 
   return (
