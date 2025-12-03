@@ -142,7 +142,7 @@ const Navbar = () => {
   }, [tags.length]);
 
   const handleLogout = async () => {
-    await fetch("http://localhost:8080/auth/logout", {
+    await fetch(`${import.meta.env.VITE_BACKEND_URL}/auth/logout`, {
       method: "POST",
       credentials: "include",
     });
