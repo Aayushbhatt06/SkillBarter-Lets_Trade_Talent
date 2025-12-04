@@ -1,7 +1,119 @@
 const UserModel = require("../Models/User");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const PendingUser = require("../Models/PendingUser");
 require("dotenv").config();
+
+// const signup = async (req, res) => {
+//   try {
+//     const { name, email, password } = req.body;
+//     if (!name || !email || !password) {
+//       return res.status(400).json({
+//         success: false,
+//         message: "Name, email and password are required",
+//       });
+//     }
+
+//     const existingUser = await UserModel.findOne({ email });
+//     if (existingUser) {
+//       return res.status(409).json({
+//         success: false,
+//         message: "User already exists, please login",
+//       });
+//     }
+//     await PendingUser.deleteMany({ email });
+
+//     const otp = Math.floor(100000 + Math.random() * 900000);
+
+//     const hashedPassword = await bcrypt.hash(password, 10);
+
+//     const pendingUser = new PendingUser({
+//       name,
+//       email,
+//       password: hashedPassword,
+//       otp,
+//     });
+
+//     await pendingUser.save();
+
+//     return res.status(201).json({
+//       success: true,
+//       message: "OTP sent successfully",
+//     });
+//   } catch (err) {
+//     console.error(err);
+//     return res.status(500).json({
+//       success: false,
+//       message: err.message || "Server side error",
+//     });
+//   }
+// };
+
+// const otpVerification = async (req, res) => {
+//   try {
+//     const { email, otp } = req.body;
+
+//     if (!email || !otp) {
+//       return res.status(400).json({
+//         success: false,
+//         message: "Email and OTP are required",
+//       });
+//     }
+
+//     const pending = await PendingUser.findOne({ email });
+
+//     if (!pending) {
+//       return res.status(400).json({
+//         message: "There is no pending signup for this email",
+//         success: false,
+//       });
+//     }
+//     if (pending.otpExpires < Date.now()) {
+//       await PendingUser.deleteOne({ _id: pending._id });
+
+//       return res.status(400).json({
+//         message: "OTP expired, please signup again",
+//         success: false,
+//       });
+//     }
+//     if (Number(otp) !== pending.otp) {
+//       return res.status(400).json({
+//         message: "Please enter correct OTP",
+//         success: false,
+//       });
+//     }
+//     const existingUser = await UserModel.findOne({ email });
+//     if (existingUser) {
+//       await PendingUser.deleteOne({ _id: pending._id });
+
+//       return res.status(409).json({
+//         success: false,
+//         message: "User already exists, please login",
+//       });
+//     }
+
+//     await UserModel.create({
+//       name: pending.name,
+//       email: pending.email,
+//       password: pending.password,
+//     });
+
+//     await PendingUser.deleteOne({ _id: pending._id });
+
+//     return res.status(200).json({
+//       message: "Signup successful",
+//       success: true,
+//     });
+//   } catch (err) {
+//     console.error(err);
+//     return res.status(500).json({
+//       message: "Something went wrong",
+//       success: false,
+//       error: err.message,
+//     });
+//   }
+// };
+
 const signup = async (req, res) => {
   try {
     const { name, email, password } = req.body;

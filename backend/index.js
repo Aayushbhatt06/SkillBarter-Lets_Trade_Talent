@@ -10,6 +10,7 @@ const initializeSocket = require("./Controllers/Socket/socket");
 const cookieParser = require("cookie-parser");
 const profileRouter = require("./Routes/profileRoutes");
 const connectionRoute = require("./Routes/connectionRoute");
+const sendGridMail = require("./utils/SendGridMail");
 
 const server = http.createServer(app);
 initializeSocket(server);
@@ -31,6 +32,13 @@ app.get("/ping", (req, res) => {
 });
 app.get("/", (req, res) => {
   res.send("Hello World!!!");
+});
+app.get("/sendemail", async (req, res) => {
+  const otp = 280306; // or generate dynamically
+  const result = await sendGridMail(otp, "bhattaa@rknec.edu");
+  console.log("SENDGRID_API_KEY from env:", process.env.SENDGRID_API_KEY);
+
+  res.json(result);
 });
 
 app.use(bodyParser.json());
