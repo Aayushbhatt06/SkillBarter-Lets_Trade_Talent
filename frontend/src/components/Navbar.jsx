@@ -3,6 +3,7 @@ import { Menu, Search, Bell } from "lucide-react";
 import { useDispatch } from "react-redux";
 import { logout } from "../Redux/userSlice";
 import { useNavigate } from "react-router-dom";
+import { sendConnection } from "./SendConnection";
 
 const DEFAULT = "Let's Trade Talent!!!";
 
@@ -16,6 +17,8 @@ const Navbar = () => {
   const isMounted = useRef(true);
   const lastIndexRef = useRef(-1);
   const [isSearching, setIsSearching] = useState(false);
+  const [message, setMessage] = useState("");
+  const [error, setError] = useState(false);
   const [searchRes, setSearchRes] = useState([]);
 
   const [searchInput, setSearch] = useState("");
@@ -152,29 +155,69 @@ const Navbar = () => {
     window.location.reload();
   };
 
+  const handleConnection = async (receiverId) => {
+    const res = await sendConnection(receiverId);
+
+    if (!res.ok || res.data.success === false) {
+      setError(true);
+      setMessage(res.data?.message || "Something went wrong");
+    } else {
+      setError(false);
+      setMessage(res.data?.message || "Request Sent Successfully");
+    }
+
+    setTimeout(() => {
+      setMessage("");
+      setError(false);
+    }, 4000);
+  };
+
   return (
     <>
+      {message && (
+        <div
+          className={`
+      fixed bottom-6 right-6 z-50
+      px-5 py-3 rounded-xl shadow-lg
+      text-white font-semibold text-sm
+      backdrop-blur-md 
+      animate-bounce
+      ${error ? "bg-red-500/80" : "bg-green-500/80"}
+    `}
+        >
+          {message}
+        </div>
+      )}
       <div
         className={`users ${
-          searchInput.length > 2 ? "flex" : "hidden"
-        } fixed flex flex-col justify-center 
-     left-1/2 -translate-x-1/2  /* <-- Centers horizontally */
-     top-16 w-[30vw] max-h-screen overflow-y-auto 
-     z-50 bg-white shadow-lg border rounded-md`}
+          searchInput.length > 2 ? "block" : "hidden"
+        } fixed left-1/2 -translate-x-1/2 top-16 
+  w-[30vw] max-h-[350px] overflow-y-auto 
+  z-50 bg-white shadow-lg border border-gray-200 rounded-lg
+  divide-y divide-gray-100`}
       >
         {searchRes.map((res) => (
           <div
             key={res._id}
-            className="p-3 flex hover:bg-gray-100 gap-3 cursor-pointer"
+            className="flex justify-between items-center px-4 py-3 hover:bg-gray-50 transition cursor-pointer"
           >
-            <div className="img">
+            <div className="flex gap-3 items-center">
               <img
-                className="w-10 h-10 rounded-full"
+                className="w-10 h-10 rounded-full object-cover"
                 src={res.image || "image.png"}
-                alt=""
+                alt="profile"
               />
+              <span className="text-gray-700 font-medium">{res.name}</span>
             </div>
-            {res.name}
+
+            <button
+              onClick={() => {
+                handleConnection(res._id);
+              }}
+              className="bg-blue-600 hover:bg-blue-700 transition text-white px-4 py-1.5 !rounded-md text-sm shadow-sm"
+            >
+              Connect
+            </button>
           </div>
         ))}
       </div>
