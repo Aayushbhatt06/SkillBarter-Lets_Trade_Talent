@@ -5,7 +5,7 @@ const userModel = require("../Models/User");
 const conReq = async (req, res) => {
   try {
     const sendId = req.user._id.toString();
-    const receiverId = req.body.receiverId;
+    const receiverId = req.body.receiverId.toString();
 
     if (!receiverId) {
       return res.status(400).json({
