@@ -10,12 +10,13 @@ import NewProject from "./components/NewProject";
 import Sidebar from "./components/Sidebar";
 import Post from "./components/Post";
 import Notification from "./components/Notification";
+import Message from "./components/Message";
 
 const Layout = () => {
   return (
     <>
       <Navbar />
-      <div className="flex bg-gray-200 min-h-screen">
+      <div className="flex h-[91.5vh] bg-gray-200">
         <Sidebar />
         <div className="flex-1 overflow-y-auto">
           <Outlet />
@@ -44,6 +45,7 @@ const router = createBrowserRouter([
       { path: "/newproject", element: <NewProject /> },
       { path: "/load-post", element: <Post /> },
       { path: "/notification", element: <Notification /> },
+      { path: "/chat", element: <Message /> },
     ],
   },
 ]);

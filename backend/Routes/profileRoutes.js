@@ -7,4 +7,5 @@ const uploader = require("../Middlewares/multer_upload");
 router.get("/", LoggedInOnly, fetchProfile);
 router.post("/edit", LoggedInOnly, uploader("profileImage"), editProfile);
 
+
 module.exports = router;

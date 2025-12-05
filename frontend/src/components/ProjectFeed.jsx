@@ -48,8 +48,8 @@ const ProjectFeed = () => {
     <>
       <div className="main max-w-[40vw] min-w-[35vw]  ">
         <div className="content flex flex-col">
-          {projects.map((project) => (
-            <ProjectCard project={project} />
+          {projects.map((project, i) => (
+            <ProjectCard project={project} key={i} />
           ))}
         </div>
       </div>

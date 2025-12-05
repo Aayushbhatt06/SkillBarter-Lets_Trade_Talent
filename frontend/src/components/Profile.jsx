@@ -109,6 +109,14 @@ const Profile = () => {
     navigate(`/profile/edit`);
   };
 
+  const sortedByName = [...connections].sort((a, b) =>
+    a.user.name.localeCompare(b.user.name)
+  );
+
+  const handleProfileNavigate = (id) => {
+    navigate(`/load-profile?id=${id}`);
+  };
+
   return (
     <>
       <div
@@ -134,7 +142,7 @@ const Profile = () => {
         </div>
       )}
       <div className="bg rounded-lg min-h-screen mt-0">
-        <div className="flex flex-col rounded-xl ml-5 min-w-[80vw] min-h-screen bg-white w-full max-w-3xl mt-3 p-4 relative">
+        <div className="flex flex-col rounded-xl ml-5 min-h-screen bg-white min-w-[76.5vw] max-w-3xl mt-3 p-4 relative">
           <div className="flex flex-col md:flex-row w-full md:items-start md:space-x-8">
             <div className="flex-shrink-0">
               {image ? (
@@ -242,18 +250,20 @@ const Profile = () => {
                     </div>
                   )}
 
-                  {connections.map((c, index) => (
+                  {sortedByName.map((c, index) => (
                     <div
                       key={index}
+                      onDoubleClick={() => handleProfileNavigate(c.user._id)}
+                      title="Double-click to visit"
                       className="flex items-center gap-3 p-2 rounded-lg border hover:bg-gray-100 transition cursor-pointer"
                     >
                       <img
-                        src={c.image || "image.png"}
-                        alt={c.name}
+                        src={c.user.image || "image.png"}
+                        alt={c.user.name}
                         className="w-10 h-10 rounded-full object-cover border"
                       />
                       <span className="text-md font-medium">
-                        {c.name || c.email || `Connection ${index + 1}`}
+                        {c.user.name || `Connection ${index + 1}`}
                       </span>
                     </div>
                   ))}

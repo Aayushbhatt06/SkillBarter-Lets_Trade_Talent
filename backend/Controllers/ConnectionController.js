@@ -219,21 +219,30 @@ const fetchConnections = async (req, res) => {
     const connections = await connectionModel
       .find({ users: targetUserId, fulfilled: true })
       .populate("users", "name image")
-      .sort({ createdAt: -1 });
+      .sort({ lastMessageAt: -1 });
 
-    const connectedUsers = connections
+    const formattedConnections = connections
       .map((conn) => {
         const otherUser = conn.users.find(
           (u) => u._id.toString() !== targetUserId.toString()
         );
-        return otherUser || null;
+
+        if (!otherUser) return null;
+
+        return {
+          user: otherUser,
+          lastMessage: conn.lastMessage,
+          lastMessageAt: conn.lastMessageAt,
+          unreadCount: conn.unreadCounts?.get(targetUserId.toString()) || 0,
+          roomId: conn.roomId,
+        };
       })
       .filter(Boolean);
 
     return res.status(200).json({
       message: "Fetched Successfully",
       success: true,
-      connections: connectedUsers,
+      connections: formattedConnections,
     });
   } catch (error) {
     console.error(error);

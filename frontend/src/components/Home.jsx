@@ -57,7 +57,7 @@ const HomePage = () => {
   }, []);
 
   return (
-    <div className="bg-gray-300 min-h-[97vh]">
+    <div className="bg-gray-300 min-h-screen">
       <div className="container mx-auto flex max-w-7xl">
         <PostFeed className="hidden" posts={posts} setPosts={setPosts} />
         <ProjectFeed />
