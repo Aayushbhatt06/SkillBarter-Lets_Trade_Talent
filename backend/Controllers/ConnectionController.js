@@ -1,4 +1,5 @@
 const connectionModel = require("../Models/Connection");
+const messages = require("../Models/messages");
 const userModel = require("../Models/User");
 
 const conReq = async (req, res) => {
@@ -179,7 +180,7 @@ const fetchConReq = async (req, res) => {
 
     const connections = await connectionModel
       .find({ fulfilled: false })
-      .populate("users", "name")
+      .populate("users", "name image")
       .sort({ createdAt: -1 });
 
     const filtered = connections.filter(
@@ -203,23 +204,36 @@ const fetchConReq = async (req, res) => {
 
 const fetchConnections = async (req, res) => {
   try {
-    const userId = req.user?._id;
-    if (!userId) {
-      return res.status(400).json({
-        message: "Please Login",
+    const loggedInUserId = req.user?._id;
+    const { userId } = req.body;
+
+    if (!loggedInUserId) {
+      return res.status(401).json({
+        message: "Please login first",
         success: false,
       });
     }
 
+    const targetUserId = userId || loggedInUserId;
+
     const connections = await connectionModel
-      .find({ users: userId, fulfilled: true })
-      .populate("users", "name")
+      .find({ users: targetUserId, fulfilled: true })
+      .populate("users", "name image")
       .sort({ createdAt: -1 });
+
+    const connectedUsers = connections
+      .map((conn) => {
+        const otherUser = conn.users.find(
+          (u) => u._id.toString() !== targetUserId.toString()
+        );
+        return otherUser || null;
+      })
+      .filter(Boolean);
 
     return res.status(200).json({
       message: "Fetched Successfully",
       success: true,
-      connections: connections,
+      connections: connectedUsers,
     });
   } catch (error) {
     console.error(error);
