@@ -80,4 +80,48 @@ const newMessage = async (req, res) => {
   }
 };
 
-module.exports = { newMessage, loadMessages };
+const markAsRead = async (req, res) => {
+  try {
+    const { id } = req.body;
+    const userId = req.user._id;
+
+    if (!id) {
+      return res
+        .status(400)
+        .json({ success: false, message: "id is required" });
+    }
+
+    const roomId = getRoomId(id, userId);
+
+    const msgsResult = await messageDb.updateMany(
+      {
+        roomId,
+        readBy: { $ne: userId },
+      },
+      {
+        $push: { readBy: userId },
+      }
+    );
+    const conn = await Connection.findOneAndUpdate(
+      { roomId },
+      {
+        $set: {
+          [`unreadCounts.${userId.toString()}`]: 0,
+        },
+      },
+      { new: true }
+    );
+
+    return res.status(200).json({
+      message: "Messages marked as read",
+      success: true,
+      modifiedCount: msgsResult.modifiedCount,
+      connection: conn,
+    });
+  } catch (error) {
+    console.error("markAsRead error:", error);
+    return res.status(500).json({ success: false, error: error.message });
+  }
+};
+
+module.exports = { newMessage, loadMessages, markAsRead };
