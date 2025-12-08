@@ -21,9 +21,12 @@ const userSlice = createSlice({
       state.image = image;
       state.skills = skills;
       state.isAuthenticated = true;
+
+      localStorage.setItem("user", JSON.stringify(state));
     },
     logout: (state) => {
       Object.assign(state, initialState);
+      localStorage.removeItem("user");
     },
     updateUser: (state, action) => {
       const { id, name, email, image, skills } = action.payload;
@@ -33,6 +36,8 @@ const userSlice = createSlice({
       state.image = image;
       state.skills = skills;
       state.isAuthenticated = true;
+
+      localStorage.setItem("user", JSON.stringify(state));
     },
   },
 });

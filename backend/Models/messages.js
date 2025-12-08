@@ -18,7 +18,7 @@ const messageSchema = new mongoose.Schema(
     },
     readBy: [
       {
-        type: Schema.Types.ObjectId,
+        type: mongoose.Schema.Types.ObjectId,
         ref: "User",
       },
     ],

@@ -151,6 +151,7 @@ const Navbar = () => {
       method: "POST",
       credentials: "include",
     });
+    socket.disconnect();
     dispatch(logout());
     window.location.reload();
   };

@@ -3,6 +3,7 @@ import { useDispatch } from "react-redux";
 import { login } from "../Redux/userSlice";
 import PostFeed from "./PostFeed";
 import ProjectFeed from "./ProjectFeed";
+import { socket } from "../../utils/Socket";
 
 const HomePage = () => {
   const dispatch = useDispatch();
@@ -50,10 +51,24 @@ const HomePage = () => {
     };
 
     fetchUser();
-  }, [dispatch]);
+  }, []);
 
   useEffect(() => {
     fetchPosts();
+    socket.connect();
+    socket.on("connect", () => {
+      console.log("Socket connected:", socket.id);
+    });
+
+    socket.on("userOnline", (data) => {
+      console.log("userOnline", data);
+    });
+
+    return () => {
+      socket.off("connect");
+      socket.off("userOnline");
+      // socket.disconnect();
+    };
   }, []);
 
   return (

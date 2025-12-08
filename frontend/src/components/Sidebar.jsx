@@ -77,7 +77,7 @@ const Sidebar = () => {
   }, [SearchConn, connections]);
 
   const handleChatNavigation = (roomId, id) => {
-    navigate(`/chat?roomId=${roomId}&id=${id}`);
+    navigate(`/chat?id=${id}`);
   };
 
   return (

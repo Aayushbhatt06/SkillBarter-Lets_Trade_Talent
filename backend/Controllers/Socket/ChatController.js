@@ -62,9 +62,6 @@ const newMessage = async (req, res) => {
       {
         $set: { lastMessage: text, lastMessageAt: new Date() },
         $inc: { [`unreadCounts.${otherUserId}`]: 1 },
-        $setOnInsert: {
-          users: [userId, otherUserId],
-        },
       },
       { new: true }
     );

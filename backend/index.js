@@ -11,6 +11,8 @@ const cookieParser = require("cookie-parser");
 const profileRouter = require("./Routes/profileRoutes");
 const connectionRoute = require("./Routes/connectionRoute");
 const sendGridMail = require("./utils/SendGridMail");
+const LoggedInOnly = require("./Middlewares/LoggedInOnly");
+const chatRoute = require("./Routes/chatRouter");
 
 const server = http.createServer(app);
 initializeSocket(server);
@@ -47,6 +49,7 @@ app.use("/auth", AuthRouter);
 app.use("/api", ApiRouter);
 app.use("/profile", profileRouter);
 app.use("/connection", connectionRoute);
+app.use("/chat", LoggedInOnly, chatRoute);
 
 server.listen(PORT, () => {
   console.log(`Listening on Port ${PORT}`);
