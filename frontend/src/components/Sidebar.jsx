@@ -76,8 +76,10 @@ const Sidebar = () => {
     }
   }, [SearchConn, connections]);
 
-  const handleChatNavigation = (roomId, id) => {
-    navigate(`/chat?id=${id}`);
+  const handleChatNavigation = (user, id) => {
+    navigate(`/chat?id=${id}`, {
+      state: { otherUser: user },
+    });
   };
 
   return (
@@ -149,7 +151,7 @@ const Sidebar = () => {
               <div key={conn.user._id}>
                 <div
                   onClick={() => {
-                    handleChatNavigation(conn.roomId, conn.user._id);
+                    handleChatNavigation(conn.user, conn.user._id);
                   }}
                   className="flex items-center gap-3 px-2 py-1 rounded-lg hover:bg-gray-100 cursor-pointer transition"
                 >

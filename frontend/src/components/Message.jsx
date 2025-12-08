@@ -6,15 +6,20 @@ import { useDispatch } from "react-redux";
 
 const Message = () => {
   const location = useLocation();
+  const navState = location.state;
   const userId = JSON.parse(localStorage.getItem("user"))?.id;
   const params = new URLSearchParams(location.search);
   const receiverId = params.get("id");
   const dispatch = useDispatch();
+  const [isTyping, setIsTyping] = useState(false);
+  const [isOtherTyping, setIsOtherTyping] = useState(false);
 
   const [newMsg, setNewMsg] = useState("");
   const [messages, setMessages] = useState([]);
   const [roomId, setRoomId] = useState(null);
   const messagesEndRef = useRef(null);
+
+  const otherUser = navState.otherUser;
 
   const msgAt = (createdAt) => {
     return new Date(createdAt).toLocaleTimeString([], {
@@ -70,6 +75,7 @@ const Message = () => {
       setRoomId(roomId);
     });
     socket.on("messageReceived", handleMessageReceived);
+
     return () => {
       socket.off("joinedChat");
       socket.off("messageReceived", handleMessageReceived);
@@ -82,6 +88,30 @@ const Message = () => {
     }
   }, [messages]);
 
+  useEffect(() => {
+    if (!socket) return;
+
+    const handleTyping = ({ roomId: rId, userId: senderId }) => {
+      if (senderId?.toString() === receiverId?.toString()) {
+        setIsOtherTyping(true);
+      }
+    };
+
+    const handleStopTyping = ({ roomId: rId, userId: senderId }) => {
+      if (senderId?.toString() === receiverId?.toString()) {
+        setIsOtherTyping(false);
+      }
+    };
+
+    socket.on("typing", handleTyping);
+    socket.on("stopTyping", handleStopTyping);
+
+    return () => {
+      socket.off("typing", handleTyping);
+      socket.off("stopTyping", handleStopTyping);
+    };
+  }, [receiverId]);
+
   const handleSend = () => {
     const text = newMsg.trim();
     if (!text || !receiverId) return;
@@ -92,6 +122,18 @@ const Message = () => {
 
     setNewMsg("");
   };
+
+  useEffect(() => {
+    if (!socket) return;
+    if (newMsg.trim().length > 0 && isTyping === false) {
+      socket.emit("typing", { to: receiverId });
+      setIsTyping(true);
+    }
+    if (newMsg.trim().length === 0 && isTyping === true) {
+      socket.emit("stopTyping", { to: receiverId });
+      setIsTyping(false);
+    }
+  }, [newMsg]);
 
   useEffect(() => {
     if (!userId) {
@@ -123,6 +165,8 @@ const Message = () => {
 
       fetchUser();
     }
+
+    socket.emit("markAsRead", { from: receiverId });
   }, []);
 
   return (
@@ -130,11 +174,15 @@ const Message = () => {
       <div className="header flex items-center rounded-b-2xl gap-3 bg-slate-800 absolute min-w-[80vw]">
         <img
           className="h-10 w-10 rounded-full p-1 m-3 mx-2"
-          src={"image.png"}
+          src={otherUser.image || "image.png"}
           alt=""
         />
-        <div className="userName">
-          <p className="font-medium text-2xl text-white">Aayush</p>
+        <div className="flex flex-col">
+          <p className="text-xl font-semibold text-white">{otherUser.name}</p>
+
+          {isOtherTyping && (
+            <span className="text-sm text-gray-300 italic">Typing...</span>
+          )}
         </div>
       </div>
       <div className="bg-gray-100 h-[80vh]">
@@ -186,7 +234,7 @@ const Message = () => {
         <button
           title="Send"
           onClick={handleSend}
-          className="mx-2 border-gray-400 border-2 p-2 items-center rounded-md"
+          className="mx-2 border-gray-200 bg-slate-700 border-2 p-2 items-center !rounded-lg hover:bg-slate-900"
         >
           <Send className="text-white" />
         </button>
