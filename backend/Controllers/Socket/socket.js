@@ -84,12 +84,39 @@ const initializeSocket = (server) => {
             },
           },
           { new: true }
-        );
+        ).populate("users", "name image");
+
+        const updatedConn = (targetUserId) => {
+          const otherUser = conn.users.find(
+            (u) => u._id.toString() !== targetUserId.toString()
+          );
+
+          if (!otherUser) return null;
+
+          return {
+            _id: conn._id,
+            user: otherUser,
+            lastMessage: conn.lastMessage,
+            lastMessageAt: conn.lastMessageAt,
+            unreadCount: conn.unreadCounts?.get(targetUserId.toString()) || 0,
+            roomId: conn.roomId,
+          };
+        };
+
+        const payloadForSender = updatedConn(userId);
+        const payloadForReceiver = updatedConn(otherUserId);
+
+        if (payloadForSender) {
+          io.to(`user:${userId}`).emit("connectionUpdated", payloadForSender);
+        }
+        if (payloadForReceiver) {
+          io.to(`user:${otherUserId}`).emit(
+            "connectionUpdated",
+            payloadForReceiver
+          );
+        }
 
         io.to(roomId).emit("messageReceived", populatedMsg);
-
-        io.to(`user:${userId}`).emit("connectionUpdated", conn);
-        io.to(`user:${otherUserId}`).emit("connectionUpdated", conn);
       } catch (err) {
         console.error("sendMessage error:", err);
         socket.emit("messageError", { error: "Failed to send message" });
@@ -131,17 +158,42 @@ const initializeSocket = (server) => {
             },
           },
           { new: true }
-        );
+        ).populate("users", "name image");
 
-        io.to(roomId).emit("messages  Read", {
+        io.to(roomId).emit("messagesRead", {
           roomId,
           userId,
           modifiedCount: res.modifiedCount,
         });
 
-        if (conn) {
-          io.to(`user:${userId}`).emit("connectionUpdated", conn);
-          io.to(`user:${otherUserId}`).emit("connectionUpdated", conn);
+        const updatedConn = (targetUserId) => {
+          const otherUser = conn.users.find(
+            (u) => u._id.toString() !== targetUserId.toString()
+          );
+
+          if (!otherUser) return null;
+
+          return {
+            _id: conn._id,
+            user: otherUser,
+            lastMessage: conn.lastMessage,
+            lastMessageAt: conn.lastMessageAt,
+            unreadCount: conn.unreadCounts?.get(targetUserId.toString()) || 0,
+            roomId: conn.roomId,
+          };
+        };
+
+        const payloadForSender = updatedConn(userId);
+        const payloadForReceiver = updatedConn(otherUserId);
+
+        if (payloadForSender) {
+          io.to(`user:${userId}`).emit("connectionUpdated", payloadForSender);
+        }
+        if (payloadForReceiver) {
+          io.to(`user:${otherUserId}`).emit(
+            "connectionUpdated",
+            payloadForReceiver
+          );
         }
       } catch (err) {
         console.error("markAsRead error:", err);

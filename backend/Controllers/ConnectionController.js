@@ -230,6 +230,7 @@ const fetchConnections = async (req, res) => {
         if (!otherUser) return null;
 
         return {
+          _id: conn._id,
           user: otherUser,
           lastMessage: conn.lastMessage,
           lastMessageAt: conn.lastMessageAt,

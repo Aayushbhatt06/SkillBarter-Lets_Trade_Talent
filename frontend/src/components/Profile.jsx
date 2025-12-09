@@ -66,9 +66,6 @@ const Profile = () => {
         setConnections([]);
         return;
       }
-
-      setError(false);
-      setMessage(data.message);
       setConnections(data.connections || []);
     } catch (err) {
       setError(true);
@@ -99,6 +96,10 @@ const Profile = () => {
   const handlePostClick = (post) => {
     navigate(`/load-post?postId=${post._id}`);
     console.log("Post clicked:", post);
+  };
+
+  const handleProjectClick = (project) => {
+    navigate(`/load-project?projId=${project._id}`);
   };
 
   const handleConnectionClick = () => {
@@ -195,40 +196,43 @@ const Profile = () => {
               </div>
             </div>
           </div>
+          <div className="border-2 mt-4 rounded-full border-gray-400 "></div>
 
           <div className="grid grid-cols-3 gap-2 mt-8 w-full">
-            {posts.map((p, i) => (
-              <div
-                onDoubleClick={() => handlePostClick(p)}
-                key={`post-${i}`}
-                className="relative cursor-pointer"
-              >
-                <img
-                  src={p.image || "image.png"}
-                  alt={p.title || ""}
-                  className="w-full h-32 object-cover"
-                />
-                <div className="absolute bottom-0 left-0 w-full bg-black/50 text-white p-1 text-xs">
-                  <p>{p.title}</p>
+            {posts &&
+              posts.map((p, i) => (
+                <div
+                  onDoubleClick={() => handlePostClick(p)}
+                  key={`post-${i}`}
+                  className="relative cursor-pointer"
+                >
+                  <img
+                    src={p.image || "image.png"}
+                    alt={p.title || ""}
+                    className="w-full h-32 object-cover"
+                  />
+                  <div className="absolute bottom-0 left-0 w-full bg-black/50 text-white p-1 text-xs">
+                    <p>{p.title}</p>
+                  </div>
                 </div>
-              </div>
-            ))}
-            {projects.map((p, i) => (
-              <div
-                onDoubleClick={() => handlePostClick(p)}
-                key={`project-${i}`}
-                className="relative cursor-pointer"
-              >
-                <img
-                  src={p.image || "image.png"}
-                  alt={p.title || ""}
-                  className="w-full h-32 object-cover"
-                />
-                <div className="absolute bottom-0 left-0 w-full bg-black/50 text-white p-1 text-xs">
-                  <p>{p.title}</p>
+              ))}
+            {projects &&
+              projects.map((p, i) => (
+                <div
+                  onDoubleClick={() => handleProjectClick(p)}
+                  key={`project-${i}`}
+                  className="relative cursor-pointer"
+                >
+                  <img
+                    src={p.image || "project.png"}
+                    alt={p.name || "this is name"}
+                    className="w-full h-32 object-cover"
+                  />
+                  <div className="absolute bottom-0 left-0 w-full bg-black/50 text-white p-1 text-xs">
+                    <p>{p.name}</p>
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
           </div>
 
           {showConnections && (

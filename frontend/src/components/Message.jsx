@@ -35,6 +35,7 @@ const Message = () => {
       console.log(userId);
       setMessages((prev) => [...prev, msg]);
     }
+    socket.emit("markAsRead", { from: receiverId });
   };
 
   const loadMessages = async () => {
@@ -105,6 +106,7 @@ const Message = () => {
 
     socket.on("typing", handleTyping);
     socket.on("stopTyping", handleStopTyping);
+    socket.emit("markAsRead", { from: receiverId });
 
     return () => {
       socket.off("typing", handleTyping);
@@ -162,11 +164,9 @@ const Message = () => {
           console.error("User fetch error:", err);
         }
       };
-
+      socket.emit("markAsRead", { from: receiverId });
       fetchUser();
     }
-
-    socket.emit("markAsRead", { from: receiverId });
   }, []);
 
   return (

@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { Home, MessageSquare, User, Settings, Proportions } from "lucide-react";
+import { Home, MessageSquare, User, Proportions } from "lucide-react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { socket } from "../../utils/Socket";
 
 const Sidebar = () => {
   const [SearchConn, setSearchConn] = useState("");
@@ -39,9 +40,6 @@ const Sidebar = () => {
         setConnections([]);
         return;
       }
-
-      setError(false);
-      setMessage(data.message);
       setConnections(data.connections || []);
     } catch (err) {
       setError(true);
@@ -62,7 +60,30 @@ const Sidebar = () => {
   }, [message, error]);
 
   useEffect(() => {
+    const handleConnectionUpdated = (conn) => {
+      setConnections((prev) => {
+        let next;
+
+        const exists = prev.some((c) => c._id === conn._id);
+
+        if (exists) {
+          next = prev.map((c) => (c._id === conn._id ? conn : c));
+        } else {
+          next = [conn, ...prev];
+        }
+        return [...next].sort(
+          (a, b) => new Date(b.lastMessageAt) - new Date(a.lastMessageAt)
+        );
+      });
+    };
+
+    socket.on("connectionUpdated", handleConnectionUpdated);
+
     fetchConnections();
+
+    return () => {
+      socket.off("connectionUpdated", handleConnectionUpdated);
+    };
   }, []);
 
   useEffect(() => {
@@ -79,6 +100,14 @@ const Sidebar = () => {
   const handleChatNavigation = (user, id) => {
     navigate(`/chat?id=${id}`, {
       state: { otherUser: user },
+    });
+  };
+
+  const msgAt = (createdAt) => {
+    return new Date(createdAt).toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: true,
     });
   };
 
@@ -106,7 +135,7 @@ const Sidebar = () => {
           {message}
         </div>
       )}
-      <div className="w-[20vw] bg-white h-full sticky top-0 border-r border-gray-200 p-4">
+      <div className="hidden md:block w-[20vw] bg-white h-full sticky top-0 border-r border-gray-200 p-4">
         <nav className="bg-slate-50 space-y-2">
           <Link
             to="/"
@@ -148,29 +177,48 @@ const Sidebar = () => {
 
           <div className="space-y-2 max-h-[33vh] overflow-y-auto">
             {processedConn.map((conn) => (
-              <div key={conn.user._id}>
+              <div key={conn._id}>
                 <div
-                  onClick={() => {
-                    handleChatNavigation(conn.user, conn.user._id);
-                  }}
-                  className="flex items-center gap-3 px-2 py-1 rounded-lg hover:bg-gray-100 cursor-pointer transition"
+                  onClick={() => handleChatNavigation(conn.user, conn.user._id)}
+                  className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 cursor-pointer "
                 >
                   <img
                     src={conn.user.image || "image.png"}
                     alt={conn.user.name}
-                    className="w-10 h-10 rounded-full object-cover border"
+                    className="w-8 h-8 rounded-full obj ect-cover"
                   />
+                  <div className="flex w-full gap-2 min-w-0">
+                    <div className="flex-1 min-w-0 flex flex-col gap-0.5">
+                      <div className="flex items-center justify-between gap-2 min-w-0">
+                        <p className="font-semibold text-[12px] text-gray-900 truncate">
+                          {conn.user.name}
+                        </p>
 
-                  <div className=" min-w-0">
-                    <p className="font-medium text-gray-800 truncate">
-                      {conn.user.name}
-                    </p>
-                    <p className="text-xs text-gray-500 truncate">
-                      {conn.lastMessage || "No messages yet"}
-                    </p>
+                        {conn.unreadCount > 0 && (
+                          <div className="bg-blue-600 text-white text-[11px] rounded-full h-5 min-w-5 px-2 flex items-center justify-center shrink-0">
+                            {conn.unreadCount}
+                          </div>
+                        )}
+                      </div>
+                      <div className="flex items-center justify-between gap-2 min-w-0">
+                        <span
+                          className={`text-[10px] truncate ${
+                            conn.unreadCount > 0
+                              ? "font-semibold text-gray-800"
+                              : "text-gray-500"
+                          }`}
+                        >
+                          {conn.lastMessage || "No messages yet"}
+                        </span>
+
+                        <p className="text-[10px] text-gray-400 shrink-0">
+                          {msgAt(conn.lastMessageAt) || ""}
+                        </p>
+                      </div>
+                    </div>
                   </div>
                 </div>
-                <div className="border-b mt-1  border-gray-200 w-full"></div>
+                <div className="border-b border-gray-200 ml-16"></div>
               </div>
             ))}
           </div>

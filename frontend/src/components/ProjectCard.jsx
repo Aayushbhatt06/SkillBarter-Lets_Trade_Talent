@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { sendConnection } from "./SendConnection";
 import { useNavigate } from "react-router-dom";
+import { socket } from "../../utils/Socket";
 
 const ProjectCard = ({ project }) => {
   const navigate = useNavigate();
@@ -53,6 +54,8 @@ const ProjectCard = ({ project }) => {
       setError(false);
     }, 4000);
   };
+
+  const handleEnroll = () => {};
 
   return (
     <>
@@ -135,7 +138,12 @@ const ProjectCard = ({ project }) => {
           </div>
 
           <div className="button">
-            <button className="bg-blue-600 mx-5 my-2 mb-4 p-2 px-5 !rounded-xl text-white">
+            <button
+              onDoubleClick={() => {
+                handleEnroll();
+              }}
+              className="bg-blue-600 mx-5 my-2 mb-4 p-2 px-5 !rounded-xl text-white"
+            >
               <strong>Enroll</strong>
             </button>
           </div>
