@@ -13,6 +13,7 @@ const connectionRoute = require("./Routes/connectionRoute");
 const sendGridMail = require("./utils/SendGridMail");
 const LoggedInOnly = require("./Middlewares/LoggedInOnly");
 const chatRoute = require("./Routes/chatRouter");
+const compression = require("compression");
 
 const server = http.createServer(app);
 initializeSocket(server);
@@ -26,7 +27,7 @@ app.use(cookieParser());
 require("dotenv").config();
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
-
+app.use(compression());
 const PORT = process.env.PORT;
 
 app.get("/ping", (req, res) => {
