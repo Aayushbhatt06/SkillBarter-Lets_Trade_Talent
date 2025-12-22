@@ -11,6 +11,7 @@ import Sidebar from "./components/Sidebar";
 import Post from "./components/Post";
 import Notification from "./components/Notification";
 import Message from "./components/Message";
+import Profile_Inspect from "./components/Profile_Inspect";
 
 const Layout = () => {
   return (
@@ -46,6 +47,7 @@ const router = createBrowserRouter([
       { path: "/load-post", element: <Post /> },
       { path: "/notification", element: <Notification /> },
       { path: "/chat", element: <Message /> },
+      { path: "/load-profile", element: <Profile_Inspect /> },
     ],
   },
 ]);
