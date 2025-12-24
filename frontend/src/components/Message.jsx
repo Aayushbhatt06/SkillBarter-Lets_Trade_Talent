@@ -171,14 +171,15 @@ const Message = () => {
 
   return (
     <>
-      <div className="flex flex-col h-screen w-full">
-        <div className="header flex items-center gap-2 sm:gap-3 bg-slate-800 w-full px-3 py-3 sm:px-4 sm:py-4 rounded-b-xl sm:rounded-b-2xl shadow-lg">
+      <div className="relative flex flex-col h-screen w-full max-w-full overflow-hidden">
+        {/* Header */}
+        <div className="absolute top-0 left-0 right-0 z-10 flex items-center gap-2 sm:gap-3 bg-slate-800 px-3 py-3 sm:px-4 sm:py-4 rounded-b-xl sm:rounded-b-2xl shadow-lg">
           <img
             className="h-8 w-8 sm:h-10 sm:w-10 rounded-full flex-shrink-0"
             src={otherUser.image || "image.png"}
             alt=""
           />
-          <div className="flex flex-col min-w-0">
+          <div className="flex flex-col min-w-0 flex-1">
             <p className="text-base sm:text-xl font-semibold text-white truncate">
               {otherUser.name}
             </p>
@@ -191,9 +192,9 @@ const Message = () => {
           </div>
         </div>
 
-        {/* Chat Area */}
-        <div className="flex-1 bg-gray-100 overflow-hidden">
-          <div className="h-full overflow-y-auto px-3 py-4 sm:px-4 sm:py-6 pb-4">
+        {/* Chat Area with padding for header and input */}
+        <div className="flex-1 bg-gray-100 overflow-hidden pt-[72px] sm:pt-[80px] pb-[68px] sm:pb-[76px]">
+          <div className="h-full overflow-y-auto px-3 py-4 sm:px-4 sm:py-6">
             <div className="flex flex-col gap-2 sm:gap-3">
               {messages.map((msg) => {
                 const senderId = msg?.sender?._id ?? msg?.sender;
@@ -232,13 +233,13 @@ const Message = () => {
         </div>
 
         {/* Input Area */}
-        <div className="input flex items-center bg-slate-800 px-2 py-2 sm:px-3 sm:py-3 gap-2 sm:gap-3 w-full shadow-lg">
+        <div className="absolute bottom-0 left-0 right-0 z-10 flex items-center rounded-t-lg bg-slate-800 px-2 py-2 sm:px-3 sm:py-3 gap-2 sm:gap-3 shadow-lg">
           <input
             placeholder="Enter Message to Send"
             value={newMsg}
             onChange={(e) => setNewMsg(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleSend()}
-            className="flex-1 bg-white rounded-full px-3 py-2 sm:px-4 sm:py-3 text-sm sm:text-base outline-none focus:ring-2 focus:ring-blue-400"
+            className="flex-1 min-w-0 bg-white rounded-full px-3 py-2 sm:px-4 sm:py-3 text-sm sm:text-base outline-none focus:ring-2 focus:ring-blue-400"
             type="text"
           />
           <button

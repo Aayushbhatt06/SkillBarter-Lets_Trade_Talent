@@ -46,6 +46,14 @@ const ProjectFeed = () => {
 
   return (
     <>
+      <div
+        className={`${
+          loading ? "flex" : "hidden"
+        } flex-col justify-center items-center fixed inset-0 bg-white/70 backdrop-blur-sm z-50`}
+      >
+        <img className="w-20 h-20" src="Spinner.gif" alt="Loading..." />
+        <p className="text-gray-700 mt-2 font-semibold">Loading...</p>
+      </div>
       <div className="main max-w-[40vw] min-w-[35vw]  ">
         <div className="content flex flex-col">
           {projects.map((project, i) => (

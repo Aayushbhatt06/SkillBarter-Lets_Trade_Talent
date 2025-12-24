@@ -8,8 +8,10 @@ import { socket } from "../../utils/Socket";
 const HomePage = () => {
   const dispatch = useDispatch();
   const [posts, setPosts] = useState([]);
+  const [loading, setLoading] = useState(false);
   const fetchPosts = async () => {
     try {
+      setLoading(true);
       const res = await fetch(
         `${import.meta.env.VITE_BACKEND_URL}/api/fetchposts`,
         {
@@ -23,6 +25,8 @@ const HomePage = () => {
       setPosts(data.posts);
     } catch (error) {
       console.log(error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -72,12 +76,22 @@ const HomePage = () => {
   }, []);
 
   return (
-    <div className="bg-gray-300 min-h-screen">
-      <div className="container mx-auto flex max-w-7xl">
-        <PostFeed className="hidden" posts={posts} setPosts={setPosts} />
-        <ProjectFeed />
+    <>
+      <div
+        className={`${
+          loading ? "flex" : "hidden"
+        } flex-col justify-center items-center fixed inset-0 bg-white/70 backdrop-blur-sm z-50`}
+      >
+        <img className="w-20 h-20" src="Spinner.gif" alt="Loading..." />
+        <p className="text-gray-700 mt-2 font-semibold">Loading...</p>
       </div>
-    </div>
+      <div className="bg-gray-300 min-h-screen">
+        <div className="container mx-auto flex max-w-7xl">
+          <PostFeed className="hidden" posts={posts} setPosts={setPosts} />
+          <ProjectFeed />
+        </div>
+      </div>
+    </>
   );
 };
 
