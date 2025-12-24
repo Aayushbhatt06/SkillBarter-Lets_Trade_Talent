@@ -1,6 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { Home, MessageSquare, User, Proportions, ChartPie } from "lucide-react";
+import {
+  Home,
+  MessageSquare,
+  User,
+  Proportions,
+  PieChart,
+  Menu,
+  X,
+} from "lucide-react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { socket } from "../../utils/Socket";
@@ -12,6 +20,7 @@ const Sidebar = () => {
   const [loading, setLoading] = useState(false);
   const [connections, setConnections] = useState([]);
   const [processedConn, setProcessedConn] = useState(connections);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const userId = useSelector((state) => state.user.id);
 
@@ -101,6 +110,7 @@ const Sidebar = () => {
     navigate(`/chat?id=${id}`, {
       state: { otherUser: user },
     });
+    setIsMobileMenuOpen(false);
   };
 
   const msgAt = (createdAt) => {
@@ -111,6 +121,10 @@ const Sidebar = () => {
     });
   };
 
+  const closeMobileMenu = () => {
+    setIsMobileMenuOpen(false);
+  };
+
   return (
     <>
       <div
@@ -118,15 +132,21 @@ const Sidebar = () => {
           loading ? "flex" : "hidden"
         } flex-col justify-center items-center fixed inset-0 bg-white/70 backdrop-blur-sm z-50`}
       >
-        <img className="w-20 h-20" src="Spinner.gif" alt="Loading..." />
-        <p className="text-gray-700 mt-2 font-semibold">Loading...</p>
+        <img
+          className="w-16 h-16 sm:w-20 sm:h-20"
+          src="Spinner.gif"
+          alt="Loading..."
+        />
+        <p className="text-gray-700 mt-2 font-semibold text-sm sm:text-base">
+          Loading...
+        </p>
       </div>
       {message && (
         <div
           className={`
-            fixed bottom-6 right-6 z-50
-            px-5 py-3 rounded-xl shadow-lg
-            text-white font-semibold text-sm
+            fixed bottom-4 right-4 left-4 sm:bottom-6 sm:right-6 sm:left-auto z-50
+            px-4 py-3 sm:px-5 rounded-xl shadow-lg
+            text-white font-semibold text-xs sm:text-sm
             backdrop-blur-md 
             animate-bounce
             ${error ? "bg-red-500/80" : "bg-green-500/80"}
@@ -135,43 +155,78 @@ const Sidebar = () => {
           {message}
         </div>
       )}
-      <div className="hidden md:block w-[20vw] bg-white h-full sticky top-0 border-r border-gray-200 p-4">
-        <nav className="bg-slate-50 space-y-2">
+
+      <button
+        onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+        className="md:hidden fixed top-4 left-4 z-50 bg-none p-2 !rounded-lg shadow-lg border-none"
+      >
+        {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+      </button>
+
+      {isMobileMenuOpen && (
+        <div
+          onClick={closeMobileMenu}
+          className="md:hidden fixed inset-0 bg-black/50 z-40"
+        />
+      )}
+
+      <div
+        className={`
+          fixed md:sticky top-0 left-0 z-40 md:z-auto
+          w-[80vw] sm:w-[60vw] md:w-[20vw] 
+          bg-white h-full border-r border-gray-200 
+          p-3 sm:p-4
+          transform transition-transform duration-300 ease-in-out
+          ${
+            isMobileMenuOpen
+              ? "translate-x-0"
+              : "-translate-x-full md:translate-x-0"
+          }
+          overflow-y-auto
+        `}
+      >
+        <nav className="bg-slate-50 space-y-2 mt-12 md:mt-0">
           <Link
             to="/"
-            className="flex items-center space-x-3 px-4 py-3 text-blue-600 bg-slate-50 rounded-lg font-medium !no-underline"
+            onClick={closeMobileMenu}
+            className="flex items-center space-x-2 sm:space-x-3 px-3 py-2 sm:px-4 sm:py-3 text-sm sm:text-base text-blue-600 bg-slate-50 rounded-lg font-medium !no-underline"
           >
-            <Home size={20} />
+            <Home size={18} className="sm:w-5 sm:h-5" />
             <span>Home</span>
           </Link>
 
           <Link
             to="/profile"
-            className="flex items-center space-x-3 px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-lg !no-underline"
+            onClick={closeMobileMenu}
+            className="flex items-center space-x-2 sm:space-x-3 px-3 py-2 sm:px-4 sm:py-3 text-sm sm:text-base text-gray-700 hover:bg-gray-100 rounded-lg !no-underline"
           >
-            <User size={20} />
+            <User size={18} className="sm:w-5 sm:h-5" />
             <span>Profile</span>
           </Link>
 
           <Link
             to="/newproject"
-            className="flex items-center space-x-3 px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-lg !no-underline"
+            onClick={closeMobileMenu}
+            className="flex items-center space-x-2 sm:space-x-3 px-3 py-2 sm:px-4 sm:py-3 text-sm sm:text-base text-gray-700 hover:bg-gray-100 rounded-lg !no-underline"
           >
-            <Proportions size={20} />
+            <Proportions size={18} className="sm:w-5 sm:h-5" />
             <span>New Project</span>
           </Link>
           <Link
             to="/contribution"
-            className="flex items-center space-x-3 px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-lg !no-underline"
+            onClick={closeMobileMenu}
+            className="flex items-center space-x-2 sm:space-x-3 px-3 py-2 sm:px-4 sm:py-3 text-sm sm:text-base text-gray-700 hover:bg-gray-100 rounded-lg !no-underline"
           >
-            <ChartPie size={20} />
+            <PieChart size={18} className="sm:w-5 sm:h-5" />
             <span>Contributions</span>
           </Link>
         </nav>
-        <div className="messages mt-4 p-4 bg-white/70 border rounded-xl shadow-sm max-w-[20vw]">
-          <div className="msg_heading flex items-center gap-3">
-            <MessageSquare className="text-blue-700" />
-            <h3 className="font-semibold !text-blue-700/80 mb-3">Messages</h3>
+        <div className="messages mt-4 p-3 sm:p-4 bg-white/70 border rounded-xl shadow-sm">
+          <div className="msg_heading flex items-center gap-2 sm:gap-3">
+            <MessageSquare className="text-blue-700 w-5 h-5 sm:w-6 sm:h-6" />
+            <h3 className="font-semibold text-sm sm:text-base !text-blue-700/80 mb-3">
+              Messages
+            </h3>
           </div>
 
           <input
@@ -179,37 +234,37 @@ const Sidebar = () => {
             placeholder="Search connections..."
             value={SearchConn}
             onChange={(e) => setSearchConn(e.target.value)}
-            className="w-full px-3 py-2 text-sm border rounded-lg outline-none focus:ring-2 focus:ring-blue-300 mb-3"
+            className="w-full px-3 py-2 text-xs sm:text-sm border rounded-lg outline-none focus:ring-2 focus:ring-blue-300 mb-3"
           />
 
-          <div className="space-y-2 max-h-[30vh] overflow-y-auto">
+          <div className="space-y-2 max-h-[30vh] sm:max-h-[35vh] overflow-y-auto">
             {processedConn.map((conn) => (
               <div key={conn._id}>
                 <div
                   onClick={() => handleChatNavigation(conn.user, conn.user._id)}
-                  className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 cursor-pointer "
+                  className="flex items-center gap-2 sm:gap-3 px-2 py-2 sm:px-3 rounded-lg hover:bg-gray-100 cursor-pointer"
                 >
                   <img
                     src={conn.user.image || "image.png"}
                     alt={conn.user.name}
-                    className="w-8 h-8 rounded-full obj ect-cover"
+                    className="w-8 h-8 sm:w-10 sm:h-10 rounded-full object-cover flex-shrink-0"
                   />
                   <div className="flex w-full gap-2 min-w-0">
                     <div className="flex-1 min-w-0 flex flex-col gap-0.5">
                       <div className="flex items-center justify-between gap-2 min-w-0">
-                        <p className="font-semibold text-[12px] text-gray-900 truncate">
+                        <p className="font-semibold text-[11px] sm:text-[12px] text-gray-900 truncate">
                           {conn.user.name}
                         </p>
 
                         {conn.unreadCount > 0 && (
-                          <div className="bg-blue-600 text-white text-[11px] rounded-full h-5 min-w-5 px-2 flex items-center justify-center shrink-0">
+                          <div className="bg-blue-600 text-white text-[10px] sm:text-[11px] rounded-full h-4 sm:h-5 min-w-4 sm:min-w-5 px-1.5 sm:px-2 flex items-center justify-center shrink-0">
                             {conn.unreadCount}
                           </div>
                         )}
                       </div>
                       <div className="flex items-center justify-between gap-2 min-w-0">
                         <span
-                          className={`text-[10px] truncate ${
+                          className={`text-[9px] sm:text-[10px] truncate ${
                             conn.unreadCount > 0
                               ? "font-semibold text-gray-800"
                               : "text-gray-500"
@@ -218,14 +273,14 @@ const Sidebar = () => {
                           {conn.lastMessage || "No messages yet"}
                         </span>
 
-                        <p className="text-[10px] text-gray-400 shrink-0">
+                        <p className="text-[9px] sm:text-[10px] text-gray-400 shrink-0">
                           {msgAt(conn.lastMessageAt) || ""}
                         </p>
                       </div>
                     </div>
                   </div>
                 </div>
-                <div className="border-b border-gray-200 ml-16"></div>
+                <div className="border-b border-gray-200 ml-10 sm:ml-16"></div>
               </div>
             ))}
           </div>

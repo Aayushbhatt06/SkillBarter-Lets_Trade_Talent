@@ -171,73 +171,84 @@ const Message = () => {
 
   return (
     <>
-      <div className="header flex items-center rounded-b-2xl gap-3 bg-slate-800 absolute min-w-[80vw]">
-        <img
-          className="h-10 w-10 rounded-full p-1 m-3 mx-2"
-          src={otherUser.image || "image.png"}
-          alt=""
-        />
-        <div className="flex flex-col">
-          <p className="text-xl font-semibold text-white">{otherUser.name}</p>
+      <div className="flex flex-col h-screen w-full">
+        <div className="header flex items-center gap-2 sm:gap-3 bg-slate-800 w-full px-3 py-3 sm:px-4 sm:py-4 rounded-b-xl sm:rounded-b-2xl shadow-lg">
+          <img
+            className="h-8 w-8 sm:h-10 sm:w-10 rounded-full flex-shrink-0"
+            src={otherUser.image || "image.png"}
+            alt=""
+          />
+          <div className="flex flex-col min-w-0">
+            <p className="text-base sm:text-xl font-semibold text-white truncate">
+              {otherUser.name}
+            </p>
 
-          {isOtherTyping && (
-            <span className="text-sm text-gray-300 italic">Typing...</span>
-          )}
-        </div>
-      </div>
-      <div className="bg-gray-100 h-[80vh]">
-        <div className="chatArea  mt-[10vh]  ">
-          <div className="flex flex-col gap-2 px-4 py-4 max-h-[80vh] overflow-y-auto !pb-18">
-            {messages.map((msg) => {
-              const senderId = msg?.sender?._id ?? msg?.sender;
-              const isOwn = senderId?.toString() === userId?.toString();
-
-              return (
-                <div
-                  key={msg._id}
-                  className={`flex ${isOwn ? "justify-end" : "justify-start"}`}
-                >
-                  <div
-                    className={`shadow px-3 py-2 rounded-lg text-sm max-w-[60%] ${
-                      isOwn ? "bg-blue-500 text-white" : "bg-white"
-                    }`}
-                  >
-                    {msg.message}
-                    <div
-                      className={`flex ${
-                        isOwn
-                          ? "justify-end text-[12px] text-gray-100"
-                          : "justify-start text-[12px] text-gray-500"
-                      }`}
-                    >
-                      {msgAt(msg.createdAt)}
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-
-            <div ref={messagesEndRef} />
+            {isOtherTyping && (
+              <span className="text-xs sm:text-sm text-gray-300 italic">
+                Typing...
+              </span>
+            )}
           </div>
         </div>
-      </div>
 
-      <div className="input flex items-center bg-slate-800 px-2 py-2 bottom-0 gap-5 fixed min-w-[80vw]">
-        <input
-          placeholder="Enter Message to Send"
-          value={newMsg}
-          onChange={(e) => setNewMsg(e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" && handleSend()}
-          className="bg-white rounded-full px-4 py-3 ml-10 min-w-[70vw] outline-none"
-          type="text"
-        />
-        <button
-          title="Send"
-          onClick={handleSend}
-          className="mx-2 border-gray-200 bg-slate-700 border-2 p-2 items-center !rounded-lg hover:bg-slate-900"
-        >
-          <Send className="text-white" />
-        </button>
+        {/* Chat Area */}
+        <div className="flex-1 bg-gray-100 overflow-hidden">
+          <div className="h-full overflow-y-auto px-3 py-4 sm:px-4 sm:py-6 pb-4">
+            <div className="flex flex-col gap-2 sm:gap-3">
+              {messages.map((msg) => {
+                const senderId = msg?.sender?._id ?? msg?.sender;
+                const isOwn = senderId?.toString() === userId?.toString();
+
+                return (
+                  <div
+                    key={msg._id}
+                    className={`flex ${
+                      isOwn ? "justify-end" : "justify-start"
+                    }`}
+                  >
+                    <div
+                      className={`shadow px-3 py-2 sm:px-4 sm:py-2.5 rounded-lg text-xs sm:text-sm max-w-[75%] sm:max-w-[65%] md:max-w-[60%] break-words ${
+                        isOwn ? "bg-blue-500 text-white" : "bg-white"
+                      }`}
+                    >
+                      <p className="break-words">{msg.message}</p>
+                      <div
+                        className={`flex mt-1 ${
+                          isOwn
+                            ? "justify-end text-[10px] sm:text-[12px] text-gray-100"
+                            : "justify-start text-[10px] sm:text-[12px] text-gray-500"
+                        }`}
+                      >
+                        {msgAt(msg.createdAt)}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+
+              <div ref={messagesEndRef} />
+            </div>
+          </div>
+        </div>
+
+        {/* Input Area */}
+        <div className="input flex items-center bg-slate-800 px-2 py-2 sm:px-3 sm:py-3 gap-2 sm:gap-3 w-full shadow-lg">
+          <input
+            placeholder="Enter Message to Send"
+            value={newMsg}
+            onChange={(e) => setNewMsg(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && handleSend()}
+            className="flex-1 bg-white rounded-full px-3 py-2 sm:px-4 sm:py-3 text-sm sm:text-base outline-none focus:ring-2 focus:ring-blue-400"
+            type="text"
+          />
+          <button
+            title="Send"
+            onClick={handleSend}
+            className="border-gray-200 bg-slate-700 border-2 p-2 sm:p-2.5 flex items-center justify-center !rounded-lg hover:bg-slate-900 transition-colors flex-shrink-0"
+          >
+            <Send className="text-white w-4 h-4 sm:w-5 sm:h-5" />
+          </button>
+        </div>
       </div>
     </>
   );
