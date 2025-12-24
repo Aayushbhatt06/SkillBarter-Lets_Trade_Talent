@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { Home, MessageSquare, User, Proportions } from "lucide-react";
+import { Home, MessageSquare, User, Proportions, ChartPie } from "lucide-react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { socket } from "../../utils/Socket";
@@ -160,8 +160,15 @@ const Sidebar = () => {
             <Proportions size={20} />
             <span>New Project</span>
           </Link>
+          <Link
+            to="/contribution"
+            className="flex items-center space-x-3 px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-lg !no-underline"
+          >
+            <ChartPie size={20} />
+            <span>Contributions</span>
+          </Link>
         </nav>
-        <div className="messages mt-8 p-4 bg-white/70 border rounded-xl shadow-sm max-w-[20vw]">
+        <div className="messages mt-4 p-4 bg-white/70 border rounded-xl shadow-sm max-w-[20vw]">
           <div className="msg_heading flex items-center gap-3">
             <MessageSquare className="text-blue-700" />
             <h3 className="font-semibold !text-blue-700/80 mb-3">Messages</h3>
@@ -175,7 +182,7 @@ const Sidebar = () => {
             className="w-full px-3 py-2 text-sm border rounded-lg outline-none focus:ring-2 focus:ring-blue-300 mb-3"
           />
 
-          <div className="space-y-2 max-h-[33vh] overflow-y-auto">
+          <div className="space-y-2 max-h-[30vh] overflow-y-auto">
             {processedConn.map((conn) => (
               <div key={conn._id}>
                 <div

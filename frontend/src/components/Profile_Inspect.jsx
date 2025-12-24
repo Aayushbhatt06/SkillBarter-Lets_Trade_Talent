@@ -1,6 +1,7 @@
 import { useSearchParams, useNavigate } from "react-router-dom";
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
+import { sendConnection } from "./SendConnection";
 
 const Profile_Inspect = () => {
   const [SearchParams] = useSearchParams();
@@ -124,6 +125,23 @@ const Profile_Inspect = () => {
     }
   };
 
+  const handleConnection = async (receiverId) => {
+    const res = await sendConnection(receiverId);
+
+    if (!res.ok || res.data.success === false) {
+      setError(true);
+      setMessage(res.data?.message || "Something went wrong");
+    } else {
+      setError(false);
+      setMessage(res.data?.message || "Request Sent Successfully");
+    }
+
+    setTimeout(() => {
+      setMessage("");
+      setError(false);
+    }, 4000);
+  };
+
   const sortedByName = [...connections].sort((a, b) =>
     a.user.name.localeCompare(b.user.name)
   );
@@ -171,6 +189,14 @@ const Profile_Inspect = () => {
             <div className="flex-1 mt-4 md:mt-0 flex flex-col">
               <div className="flex items-center space-x-4 gap-2">
                 <h2 className="text-2xl font-semibold">{name}</h2>
+                <button
+                  onClick={() => {
+                    handleConnection(id);
+                  }}
+                  className="px-2 py-1 text-sm font-semibold bg-blue-500 text-white rounded hover:bg-blue-600"
+                >
+                  Connect
+                </button>
               </div>
               <div className="flex space-x-6 mt-4">
                 <div>

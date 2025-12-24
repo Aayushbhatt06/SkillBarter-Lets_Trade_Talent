@@ -12,6 +12,7 @@ import Post from "./components/Post";
 import Notification from "./components/Notification";
 import Message from "./components/Message";
 import Profile_Inspect from "./components/Profile_Inspect";
+import Contribution from "./components/Contribution";
 
 const Layout = () => {
   return (
@@ -48,6 +49,7 @@ const router = createBrowserRouter([
       { path: "/notification", element: <Notification /> },
       { path: "/chat", element: <Message /> },
       { path: "/load-profile", element: <Profile_Inspect /> },
+      { path: "/contribution", element: <Contribution /> },
     ],
   },
 ]);
