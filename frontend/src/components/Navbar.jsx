@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Menu, Search, Bell } from "lucide-react";
+import { Menu, Search, Bell, LogOut, MoreVertical, X } from "lucide-react";
 import { useDispatch } from "react-redux";
 import { logout } from "../Redux/userSlice";
 import { useNavigate } from "react-router-dom";
@@ -20,9 +20,22 @@ const Navbar = () => {
   const [message, setMessage] = useState("");
   const [error, setError] = useState(false);
   const [searchRes, setSearchRes] = useState([]);
+  const [showMenu, setShowMenu] = useState(false);
+  const menuRef = useRef(null);
 
   const [searchInput, setSearch] = useState("");
   const handelOnChange = (e) => setSearch(e.target.value);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (menuRef.current && !menuRef.current.contains(event.target)) {
+        setShowMenu(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   useEffect(() => {
     const query = searchInput.trim();
@@ -64,6 +77,7 @@ const Navbar = () => {
       setSearchRes([]);
     }
   };
+
   const clearTyping = () => {
     if (typingRef.current) {
       clearInterval(typingRef.current);
@@ -151,7 +165,6 @@ const Navbar = () => {
       method: "POST",
       credentials: "include",
     });
-    socket.disconnect();
     dispatch(logout());
     window.location.reload();
   };
@@ -189,33 +202,36 @@ const Navbar = () => {
           {message}
         </div>
       )}
+
       <div
         className={`users ${
           searchInput.length > 2 ? "block" : "hidden"
-        } fixed left-1/2 -translate-x-1/2 top-16 
-  w-[30vw] max-h-[350px] overflow-y-auto 
+        } fixed left-1/2 -translate-x-1/2 top-16 md:top-20
+  w-[90vw] md:w-[30vw] max-h-[350px] overflow-y-auto 
   z-50 bg-white shadow-lg border border-gray-200 rounded-lg
   divide-y divide-gray-100`}
       >
         {searchRes.map((res) => (
           <div
             key={res._id}
-            className="flex justify-between items-center px-4 py-3 hover:bg-gray-50 transition cursor-pointer"
+            className="flex justify-between items-center px-3 md:px-4 py-3 hover:bg-gray-50 transition cursor-pointer"
           >
-            <div className="flex gap-3 items-center">
+            <div className="flex gap-2 md:gap-3 items-center">
               <img
-                className="w-10 h-10 rounded-full object-cover"
+                className="w-8 h-8 md:w-10 md:h-10 rounded-full object-cover"
                 src={res.image || "image.png"}
                 alt="profile"
               />
-              <span className="text-gray-700 font-medium">{res.name}</span>
+              <span className="text-sm md:text-base text-gray-700 font-medium truncate">
+                {res.name}
+              </span>
             </div>
 
             <button
               onClick={() => {
                 handleConnection(res._id);
               }}
-              className="bg-blue-600 hover:bg-blue-700 transition text-white px-4 py-1.5 !rounded-md text-sm shadow-sm"
+              className="bg-blue-600 hover:bg-blue-700 transition text-white px-3 md:px-4 py-1.5 rounded-md text-xs md:text-sm shadow-sm whitespace-nowrap"
             >
               Connect
             </button>
@@ -224,55 +240,89 @@ const Navbar = () => {
       </div>
 
       <header className="bg-slate-800">
-        <div className="mx-auto flex flex-col gap-2 px-4 py-2 md:flex-row md:items-center md:justify-between">
-          <div className="flex items-center gap-2 md:w-1/4 md:min-w-[220px]">
-            <Menu className="text-white md:hidden" />
-            <div className="heading flex gap-0 justify-items-start">
-              <h6
-                onClick={() => {
-                  navigate("/");
-                }}
-                className="truncate ml-2 mt-2 !text-[16px] cursor-pointer font-semibold text-white"
-              >
-                SkillBarter :{" "}
-              </h6>
-              <h6 className="truncate ml-2 mt-2 !text-[16px] font-semibold text-white">
-                {tagline}
-              </h6>
-            </div>
+        <div className="mx-auto flex items-center justify-between gap-2 px-3 md:px-4 py-2.5 md:py-3">
+          <div className="flex items-center gap-2 flex-shrink-0 w-[120px] lg:w-[350px]">
+            <h6
+              onClick={() => navigate("/")}
+              className="text-sm md:text-base cursor-pointer font-semibold text-white whitespace-nowrap"
+            >
+              SkillBarter
+            </h6>
+            <h6 className="hidden lg:block text-sm md:text-base font-semibold text-white truncate">
+              : {tagline}
+            </h6>
           </div>
 
-          <div className="w-full md:w-1/2 md:max-w-2xl md:px-2">
+          <div className="flex-1 max-w-md mx-2 md:mx-4">
             <div className="relative" role="search">
-              <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-slate-600">
-                <Search size={18} />
+              <span className="pointer-events-none absolute inset-y-0 left-2 md:left-3 flex items-center text-slate-600">
+                <Search size={16} className="md:w-[18px] md:h-[18px]" />
               </span>
 
               <input
                 onChange={handelOnChange}
                 value={searchInput}
                 type="search"
-                placeholder="Search skills, people, or tags"
-                className="w-full rounded-full bg-white/90 pl-12 pr-4 py-2.5 text-sm text-slate-800 placeholder:text-slate-500 shadow-sm focus:outline-none focus:ring-2 focus:ring-white-300"
+                placeholder="Search..."
+                className="w-full rounded-full bg-white/90 pl-8 md:pl-12 pr-3 md:pr-4 py-1.5 md:py-2.5 text-xs md:text-sm text-slate-800 placeholder:text-slate-500 shadow-sm focus:outline-none focus:ring-2 focus:ring-white-300"
               />
             </div>
           </div>
 
-          <div className="flex items-center justify-end gap-3 md:w-1/4 md:min-w-[180px]">
+          <div className="hidden md:flex items-center gap-3 flex-shrink-0 w-[180px] justify-end">
             <button
-              className="text-white"
-              onClick={() => {
-                navigate("/notification");
-              }}
+              className="text-white hover:text-gray-300 transition"
+              onClick={() => navigate("/notification")}
             >
-              <Bell />
+              <Bell size={20} />
             </button>
             <button
               onClick={handleLogout}
-              className="bg-red-700 px-4 py-2 rounded text-white"
+              className="bg-red-700 hover:bg-red-800 transition px-4 py-2 rounded text-white text-sm font-medium"
             >
               Logout
             </button>
+          </div>
+
+          <div
+            className="md:hidden relative flex-shrink-0 w-[40px]"
+            ref={menuRef}
+          >
+            <button
+              onClick={() => setShowMenu(!showMenu)}
+              className="text-white p-1.5 hover:bg-slate-700 rounded-lg transition"
+            >
+              {showMenu ? <X size={20} /> : <MoreVertical size={20} />}
+            </button>
+
+            {showMenu && (
+              <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 overflow-hidden z-50">
+                <button
+                  onClick={() => {
+                    navigate("/notification");
+                    setShowMenu(false);
+                  }}
+                  className="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition text-left"
+                >
+                  <Bell size={18} className="text-gray-600" />
+                  <span className="text-sm text-gray-700 font-medium">
+                    Notifications
+                  </span>
+                </button>
+                <button
+                  onClick={() => {
+                    handleLogout();
+                    setShowMenu(false);
+                  }}
+                  className="w-full flex items-center gap-3 px-4 py-3 hover:bg-red-50 transition text-left border-t border-gray-100"
+                >
+                  <LogOut size={18} className="text-red-600" />
+                  <span className="text-sm text-red-600 font-medium">
+                    Logout
+                  </span>
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </header>

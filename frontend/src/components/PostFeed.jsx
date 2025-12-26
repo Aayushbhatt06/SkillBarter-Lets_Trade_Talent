@@ -61,7 +61,7 @@ const PostFeed = ({ posts, setPosts }) => {
         </div>
       )}
 
-      <div className="flex-1 px-6 py-4 max-w-[40vw]">
+      <div className="w-full lg:flex-1 px-4 lg:px-6 py-4 lg:max-w-[40vw]">
         <InstantPost setPosts={setPosts} />
 
         <div className="space-y-6">

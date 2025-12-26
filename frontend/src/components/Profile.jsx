@@ -2,6 +2,19 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 
+const getCache = (key) => {
+  try {
+    const data = localStorage.getItem(key);
+    return data ? JSON.parse(data) : null;
+  } catch {
+    return null;
+  }
+};
+
+const setCache = (key, value) => {
+  localStorage.setItem(key, JSON.stringify(value));
+};
+
 const Profile = () => {
   const navigate = useNavigate();
   const userId = useSelector((state) => state.user.id);
@@ -20,6 +33,25 @@ const Profile = () => {
   const [error, setError] = useState(false);
   const [message, setMessage] = useState("");
 
+  useEffect(() => {
+    const cachedProfile = getCache("profileData");
+    if (cachedProfile) {
+      setName(cachedProfile.user?.name || "");
+      setSkills(cachedProfile.user?.skills || []);
+      setBio(cachedProfile.user?.bio || "");
+      setImage(cachedProfile.user?.image || "image.png");
+      setPosts(cachedProfile.posts || []);
+      setProjects(cachedProfile.projects || []);
+      setPostCount(cachedProfile.posts?.length || 0);
+      setProjectCount(cachedProfile.projects?.length || 0);
+    }
+
+    const cachedConnections = getCache("connectionsData");
+    if (cachedConnections) {
+      setConnections(cachedConnections);
+    }
+  }, []);
+
   const fetchProfileData = async () => {
     try {
       const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/profile`, {
@@ -30,14 +62,17 @@ const Profile = () => {
       if (!res.ok) throw new Error("Unable to fetch profile data");
 
       const data = await res.json();
+
       setName(data.user.name || "");
       setSkills(data.user.skills || []);
       setBio(data.user.bio || "");
       setImage(data.user.image || "image.png");
       setPosts(data.posts || []);
       setProjects(data.projects || []);
-      setPostCount(data.posts ? data.posts.length : 0);
-      setProjectCount(data.projects ? data.projects.length : 0);
+      setPostCount(data.posts?.length || 0);
+      setProjectCount(data.projects?.length || 0);
+
+      setCache("profileData", data);
     } catch (error) {
       console.error(error);
     }
@@ -61,15 +96,14 @@ const Profile = () => {
       const data = await res.json();
 
       if (!res.ok || !data.success) {
-        setError(true);
-        setMessage(data.message || "Something went wrong");
-        setConnections([]);
-        return;
+        throw new Error(data.message || "Something went wrong");
       }
+
       setConnections(data.connections || []);
+      setCache("connectionsData", data.connections || []);
     } catch (err) {
       setError(true);
-      setMessage(err?.message || "Network error");
+      setMessage(err.message || "Network error");
       setConnections([]);
     } finally {
       setLoading(false);
@@ -77,206 +111,172 @@ const Profile = () => {
   };
 
   useEffect(() => {
-    if (!message && !error) return;
+    const cachedProfile = getCache("profileData");
+    const cachedConnections = getCache("connectionsData");
+
+    if (!cachedProfile) {
+      fetchProfileData();
+    }
+
+    if (!cachedConnections) {
+      fetchConnections();
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!message) return;
     const timer = setTimeout(() => {
       setError(false);
       setMessage("");
     }, 4000);
     return () => clearTimeout(timer);
-  }, [message, error]);
-
-  useEffect(() => {
-    fetchProfileData();
-  }, []);
-
-  useEffect(() => {
-    fetchConnections();
-  }, []);
+  }, [message]);
 
   const handlePostClick = (post) => {
     navigate(`/load-post?postId=${post._id}`);
-    console.log("Post clicked:", post);
   };
 
   const handleProjectClick = (project) => {
     navigate(`/load-project?projId=${project._id}`);
   };
 
-  const handleConnectionClick = () => {
-    setShowConnections(!showConnections);
-  };
-
-  const handleEditProfile = () => {
-    navigate(`/profile/edit`);
+  const handleProfileNavigate = (id) => {
+    navigate(`/load-profile?id=${id}`);
   };
 
   const sortedByName = [...connections].sort((a, b) =>
     a.user.name.localeCompare(b.user.name)
   );
 
-  const handleProfileNavigate = (id) => {
-    navigate(`/load-profile?id=${id}`);
-  };
-
   return (
     <>
-      <div
-        className={`${
-          loading ? "flex" : "hidden"
-        } flex-col justify-center items-center fixed inset-0 bg-white/70 backdrop-blur-sm z-50`}
-      >
-        <img className="w-20 h-20" src="Spinner.gif" alt="Loading..." />
-        <p className="text-gray-700 mt-2 font-semibold">Loading...</p>
-      </div>
+      {loading && (
+        <div className="fixed inset-0 bg-white/80 backdrop-blur-sm z-50 flex flex-col items-center justify-center">
+          <img src="Spinner.gif" className="w-16 h-16" alt="loading" />
+          <p className="mt-3 text-gray-600">Loading...</p>
+        </div>
+      )}
+
       {message && (
         <div
-          className={`
-            fixed bottom-6 right-6 z-50
-            px-5 py-3 rounded-xl shadow-lg
-            text-white font-semibold text-sm
-            backdrop-blur-md 
-            animate-bounce
-            ${error ? "bg-red-500/80" : "bg-green-500/80"}
-          `}
+          className={`fixed bottom-8 right-8 px-6 py-3 rounded-lg shadow-lg text-white ${
+            error ? "bg-red-500" : "bg-green-500"
+          }`}
         >
           {message}
         </div>
       )}
-      <div className="bg rounded-lg min-h-screen mt-0">
-        <div className="flex flex-col rounded-xl ml-5 min-h-screen bg-white min-w-[76.5vw] max-w-3xl mt-3 p-4 relative">
-          <div className="flex flex-col md:flex-row w-full md:items-start md:space-x-8">
-            <div className="flex-shrink-0">
-              {image ? (
-                <img
-                  src={image}
-                  alt="Profile"
-                  className="rounded-full w-32 h-32 object-cover border-2 border-gray-300"
-                />
-              ) : (
-                <div className="rounded-full w-32 h-32 bg-gray-300 border-2 border-gray-300 flex items-center justify-center text-gray-700">
-                  No Image
-                </div>
-              )}
-            </div>
-            <div className="flex-1 mt-4 md:mt-0 flex flex-col">
-              <div className="flex items-center space-x-4 gap-2">
-                <h2 className="text-2xl font-semibold">{name}</h2>
+
+      <div className="min-h-screen bg-gray-50 py-6 px-4">
+        <div className="max-w-5xl mx-auto bg-white rounded-2xl shadow-sm p-8">
+          <div className="flex flex-col md:flex-row gap-8 border-b pb-8">
+            <img
+              src={image}
+              alt="profile"
+              className="w-36 h-36 rounded-full object-cover border-4 border-gray-100"
+            />
+
+            <div className="flex-1">
+              <div className="flex items-center gap-4 mb-4">
+                <h2 className="text-3xl font-bold">{name}</h2>
                 <button
-                  onClick={handleEditProfile}
-                  className="px-2 py-1 text-sm font-semibold bg-blue-500 text-white rounded hover:bg-blue-600"
+                  onClick={() => navigate("/profile/edit")}
+                  className="bg-blue-500 text-white px-4 py-2 rounded-lg"
                 >
                   Edit Profile
                 </button>
               </div>
-              <div className="flex space-x-6 mt-4">
+
+              <div className="flex gap-8 mb-4">
                 <div>
-                  <span className="font-semibold">{postCount}</span> posts
+                  <p className="text-xl font-bold">{postCount}</p>
+                  <p className="text-sm text-gray-600">Posts</p>
                 </div>
                 <div>
-                  <span className="font-semibold">{projectCount}</span> projects
+                  <p className="text-xl font-bold">{projectCount}</p>
+                  <p className="text-sm text-gray-600">Projects</p>
                 </div>
                 <div
-                  onClick={handleConnectionClick}
-                  className="cursor-pointer relative"
+                  className="cursor-pointer"
+                  onClick={() => setShowConnections(true)}
                 >
-                  <span className="font-semibold">{connections.length}</span>{" "}
-                  connections
+                  <p className="text-xl font-bold">{connections.length}</p>
+                  <p className="text-sm text-gray-600">Connections</p>
                 </div>
               </div>
-              <div className="mt-3">
-                <p className="text-sm">{bio}</p>
-              </div>
-              <div className="skills mt-2">
-                {skills.map((skill, index) => (
-                  <React.Fragment key={index}>
-                    <span className="text-sm font-medium">{skill}</span>
-                    {index !== skills.length - 1 && <span>, </span>}
-                  </React.Fragment>
+
+              {bio && <p className="text-gray-700 mb-3">{bio}</p>}
+
+              <div className="flex flex-wrap gap-2">
+                {skills.map((skill, i) => (
+                  <span
+                    key={i}
+                    className="px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-sm"
+                  >
+                    {skill}
+                  </span>
                 ))}
               </div>
             </div>
           </div>
-          <div className="border-2 mt-4 rounded-full border-gray-400 "></div>
 
-          <div className="grid grid-cols-3 gap-2 mt-8 w-full">
-            {posts &&
-              posts.map((p, i) => (
-                <div
-                  onDoubleClick={() => handlePostClick(p)}
-                  key={`post-${i}`}
-                  className="relative cursor-pointer"
-                >
-                  <img
-                    src={p.image || "image.png"}
-                    alt={p.title || ""}
-                    className="w-full h-32 object-cover"
-                  />
-                  <div className="absolute bottom-0 left-0 w-full bg-black/50 text-white p-1 text-xs">
-                    <p>{p.title}</p>
-                  </div>
-                </div>
-              ))}
-            {projects &&
-              projects.map((p, i) => (
-                <div
-                  onDoubleClick={() => handleProjectClick(p)}
-                  key={`project-${i}`}
-                  className="relative cursor-pointer"
-                >
-                  <img
-                    src={p.image || "project.png"}
-                    alt={p.name || "this is name"}
-                    className="w-full h-32 object-cover"
-                  />
-                  <div className="absolute bottom-0 left-0 w-full bg-black/50 text-white p-1 text-xs">
-                    <p>{p.name}</p>
-                  </div>
-                </div>
-              ))}
-          </div>
-
-          {showConnections && (
-            <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-              <div className="bg-white rounded-lg p-6 min-w-[30vw] relative">
-                <h3 className="text-xl font-semibold mb-4">Connections</h3>
-
-                <button
-                  className="absolute top-2 right-2 text-gray-500 hover:text-gray-700 font-bold"
-                  onClick={() => setShowConnections(false)}
-                >
-                  ✕
-                </button>
-
-                <div className="max-h-72 overflow-y-auto space-y-3 pr-2">
-                  {connections.length === 0 && (
-                    <div className="text-gray-500 text-center py-3">
-                      No connections found
-                    </div>
-                  )}
-
-                  {sortedByName.map((c, index) => (
-                    <div
-                      key={index}
-                      onDoubleClick={() => handleProfileNavigate(c.user._id)}
-                      title="Double-click to visit"
-                      className="flex items-center gap-3 p-2 rounded-lg border hover:bg-gray-100 transition cursor-pointer"
-                    >
-                      <img
-                        src={c.user.image || "image.png"}
-                        alt={c.user.name}
-                        className="w-10 h-10 rounded-full object-cover border"
-                      />
-                      <span className="text-md font-medium">
-                        {c.user.name || `Connection ${index + 1}`}
-                      </span>
-                    </div>
-                  ))}
-                </div>
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-8">
+            {posts.map((p, i) => (
+              <div
+                key={i}
+                onDoubleClick={() => handlePostClick(p)}
+                className="cursor-pointer rounded-lg overflow-hidden shadow"
+              >
+                <img
+                  src={p.image || "image.png"}
+                  className="w-full h-40 object-cover"
+                />
               </div>
-            </div>
-          )}
+            ))}
+            {projects.map((p, i) => (
+              <div
+                key={i}
+                onDoubleClick={() => handleProjectClick(p)}
+                className="cursor-pointer rounded-lg overflow-hidden shadow"
+              >
+                <img
+                  src={p.image || "project.png"}
+                  className="w-full h-40 object-cover"
+                />
+              </div>
+            ))}
+          </div>
         </div>
       </div>
+
+      {showConnections && (
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl p-6 w-full max-w-md">
+            <h3 className="text-xl font-bold mb-4">Connections</h3>
+            <div className="space-y-2 max-h-80 overflow-y-auto">
+              {sortedByName.map((c, i) => (
+                <div
+                  key={i}
+                  onDoubleClick={() => handleProfileNavigate(c.user._id)}
+                  className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50 cursor-pointer"
+                >
+                  <img
+                    src={c.user.image || "image.png"}
+                    className="w-10 h-10 rounded-full"
+                  />
+                  <p>{c.user.name}</p>
+                </div>
+              ))}
+            </div>
+            <button
+              onClick={() => setShowConnections(false)}
+              className="mt-4 text-red-500"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
     </>
   );
 };

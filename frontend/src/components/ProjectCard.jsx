@@ -1,12 +1,13 @@
 import React, { useState } from "react";
 import { sendConnection } from "./SendConnection";
 import { useNavigate } from "react-router-dom";
-import { socket } from "../../utils/Socket";
+import { useEffect } from "react";
 
 const ProjectCard = ({ project }) => {
   const navigate = useNavigate();
   const [error, setError] = useState(false);
   const [message, setMessage] = useState("");
+  const [loading, setLoading] = useState(false);
 
   if (!project) return null;
 
@@ -55,7 +56,55 @@ const ProjectCard = ({ project }) => {
     }, 4000);
   };
 
-  const handleEnroll = () => {};
+  useEffect(() => {
+    if (!message) return;
+
+    const timer = setTimeout(() => {
+      setError(false);
+      setMessage("");
+    }, 4000);
+
+    return () => clearTimeout(timer);
+  }, [message]);
+
+  const sendContriReq = async () => {
+    if (loading) return;
+    setLoading(true);
+    try {
+      const res = await fetch(
+        `${import.meta.env.VITE_BACKEND_URL}/contribution/request`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+          body: JSON.stringify({ projId: project._id }),
+        }
+      );
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setError(true);
+        setMessage(data.message || "Something went wrong");
+        return;
+      }
+
+      setError(false);
+      setMessage(data.message || "Request sent successfully");
+    } catch (error) {
+      console.error("Send contribution request error:", error);
+      setError(true);
+      setMessage(error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleEnroll = () => {
+    sendContriReq();
+  };
 
   return (
     <>
@@ -139,12 +188,13 @@ const ProjectCard = ({ project }) => {
 
           <div className="button">
             <button
-              onDoubleClick={() => {
+              onClick={() => {
                 handleEnroll();
               }}
+              disabled={loading}
               className="bg-blue-600 mx-5 my-2 mb-4 p-2 px-5 !rounded-xl text-white"
             >
-              <strong>Enroll</strong>
+              <strong>{loading ? "Requesting..." : "Enroll"}</strong>
             </button>
           </div>
         </div>
