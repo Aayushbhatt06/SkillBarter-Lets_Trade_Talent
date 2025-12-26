@@ -3,59 +3,68 @@ const userModel = require("../Models/User");
 
 const fetchProjects = async (req, res) => {
   try {
-    const { presentProjects = [] } = req.body;
-    const id = req.user._id;
-    const user = await userModel.findById(id);
+    const { page = 0, limit = 10 } = req.body;
+    const userId = req.user._id;
 
+    const user = await userModel.findById(userId);
     if (!user) {
       return res.status(400).json({
-        message: "User not found, Please Login",
         success: false,
+        message: "User not found",
       });
     }
 
     const skills = user.skills || [];
-    let Skprojects = [];
-    let Rnprojects = [];
+    const skip = page * limit;
+    const matchedProjects = await projectDB.aggregate([
+      {
+        $addFields: {
+          matchingSkillsCount: {
+            $size: {
+              $setIntersection: ["$requiredSkills", skills],
+            },
+          },
+        },
+      },
+      { $match: { matchingSkillsCount: { $gt: 0 } } },
+      { $sort: { matchingSkillsCount: -1, _id: -1 } },
+      { $skip: skip },
+      { $limit: limit },
+    ]);
 
-    if (skills.length > 0) {
-      Skprojects = await projectDB
+    let projects = matchedProjects;
+
+    if (projects.length < limit) {
+      const matchedIds = projects.map((p) => p._id);
+
+      const remaining = limit - projects.length;
+
+      const fallbackProjects = await projectDB
         .find({
-          requiredSkills: { $in: skills },
-          _id: { $nin: presentProjects },
+          _id: { $nin: matchedIds },
         })
-        .populate("userId", "name email image skills")
-        .limit(10);
+        .sort({ _id: -1 })
+        .skip(Math.max(0, skip - matchedProjects.length))
+        .limit(remaining);
+
+      projects = [...projects, ...fallbackProjects];
     }
 
-    const remaining = 10 - Skprojects.length;
-
-    if (remaining > 0) {
-      const excludeIds = [...presentProjects, ...Skprojects.map((p) => p._id)];
-
-      const docs = await projectDB.aggregate([
-        { $match: { _id: { $nin: excludeIds } } },
-        { $sample: { size: remaining } },
-      ]);
-
-      Rnprojects = await projectDB.populate(docs, {
-        path: "userId",
-        select: "name email image skills",
-      });
-    }
-
-    const projects = [...Skprojects, ...Rnprojects];
-
-    return res.status(200).json({
-      message: "Projects sent successfully",
-      success: true,
-      Projects: projects,
+    const populated = await projectDB.populate(projects, {
+      path: "userId",
+      select: "name email image skills",
     });
-  } catch (error) {
-    console.error("Error fetching projects:", error);
+
+    return res.json({
+      success: true,
+      Projects: populated,
+      hasMore: populated.length === limit,
+    });
+  } catch (err) {
+    console.error("fetchProjects error:", err);
     return res.status(500).json({
-      message: "Something went wrong!",
       success: false,
+      message: "Server error",
     });
   }
 };

@@ -14,6 +14,7 @@ const sendGridMail = require("./utils/SendGridMail");
 const LoggedInOnly = require("./Middlewares/LoggedInOnly");
 const chatRoute = require("./Routes/chatRouter");
 const compression = require("compression");
+const ContributionRouter = require("./Routes/ContributionsRouter");
 
 const server = http.createServer(app);
 initializeSocket(server);
@@ -51,6 +52,7 @@ app.use("/api", ApiRouter);
 app.use("/profile", profileRouter);
 app.use("/connection", connectionRoute);
 app.use("/chat", LoggedInOnly, chatRoute);
+app.use("/contribution", ContributionRouter);
 
 server.listen(PORT, () => {
   console.log(`Listening on Port ${PORT}`);

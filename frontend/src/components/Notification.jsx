@@ -112,7 +112,6 @@ const Notification = () => {
 
   return (
     <>
-      {/* Loading Spinner */}
       <div
         className={`${
           loading ? "flex" : "hidden"
@@ -122,7 +121,6 @@ const Notification = () => {
         <p className="text-gray-600 mt-3 font-medium">Loading...</p>
       </div>
 
-      {/* Toast Message */}
       {message && (
         <div
           className={`
@@ -137,10 +135,8 @@ const Notification = () => {
         </div>
       )}
 
-      {/* Main Container */}
       <div className="min-h-screen bg-gray-50 py-6 px-4">
         <div className="max-w-4xl mx-auto">
-          {/* Header Section */}
           <div className="bg-white rounded-2xl shadow-sm p-6 mb-6">
             <div className="flex items-center justify-between">
               <div>
@@ -159,7 +155,6 @@ const Notification = () => {
             </div>
           </div>
 
-          {/* Connection Requests */}
           <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
             <div className="p-6 border-b border-gray-200">
               <h2 className="text-xl font-bold text-gray-800">
@@ -168,7 +163,6 @@ const Notification = () => {
             </div>
 
             {userReq.length === 0 ? (
-              // Empty State
               <div className="p-12 text-center">
                 <div className="w-20 h-20 mx-auto mb-4 bg-gray-100 rounded-full flex items-center justify-center">
                   <svg
@@ -194,7 +188,6 @@ const Notification = () => {
                 </p>
               </div>
             ) : (
-              // Requests List
               <div className="divide-y divide-gray-200">
                 {userReq.map((con) => (
                   <div
@@ -202,7 +195,6 @@ const Notification = () => {
                     className="p-4 hover:bg-gray-50 transition-colors"
                   >
                     <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                      {/* User Info */}
                       <div
                         onClick={() => handleProfileNavigate(con.users[0]._id)}
                         className="flex items-center gap-4 cursor-pointer hover:opacity-70 transition-opacity flex-1"
@@ -222,7 +214,6 @@ const Notification = () => {
                         </div>
                       </div>
 
-                      {/* Action Buttons */}
                       <div className="flex gap-2 w-full sm:w-auto">
                         <button
                           onClick={() => reqAccept(con._id)}
@@ -244,7 +235,6 @@ const Notification = () => {
             )}
           </div>
 
-          {/* Other Notifications Section (Placeholder) */}
           <div className="bg-white rounded-2xl shadow-sm overflow-hidden mt-6">
             <div className="p-6 border-b border-gray-200">
               <h2 className="text-xl font-bold text-gray-800">
