@@ -57,6 +57,7 @@ const Post = () => {
       }
 
       setLike(data.updatedPost.like);
+      localStorage.removeItem("Posts");
     } catch (error) {
       setMessage(error);
       setError(true);

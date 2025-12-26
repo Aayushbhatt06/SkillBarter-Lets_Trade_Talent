@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { login } from "../Redux/userSlice";
+import { Eye, EyeClosed } from "lucide-react";
 
 const Login = () => {
   const [formData, setFormData] = useState({
@@ -115,7 +116,7 @@ const Login = () => {
                     Forgot password?
                   </a>
                 </div>
-                <div className="mt-2">
+                <div className="mt-2 flex">
                   <input
                     id="password"
                     type={show ? "text" : "password"}
@@ -125,8 +126,27 @@ const Login = () => {
                     placeholder="Password"
                     required
                     autoComplete="current-password"
-                    className="block w-full rounded-md bg-white/5 px-3 py-1.5 text-base text-white outline-1 -outline-offset-1 outline-white/10 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-blue-400 sm:text-sm"
+                    className="block w-full rounded-l-md bg-white/5 px-3 py-1.5 text-base text-white outline-1 -outline-offset-1 outline-white/10 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-blue-400 sm:text-sm"
                   />
+                  <button
+                    type="button"
+                    onClick={() => setShow(!show)}
+                    className="
+                    flex items-center justify-center
+                    rounded-r-md
+                    p-2
+                    bg-white/5
+                    text-gray-300
+                    border border-white/10
+                    transition-all duration-200
+                    hover:bg-white/10 hover:text-white
+                    active:scale-95
+                    focus:outline-none focus:ring-1 focus:ring-blue-400
+                  "
+                    aria-label="Toggle password visibility"
+                  >
+                    {show ? <EyeClosed size={18} /> : <Eye size={18} />}
+                  </button>
                 </div>
               </div>
 

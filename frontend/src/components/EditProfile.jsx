@@ -66,6 +66,8 @@ const EditProfile = () => {
   const [skills, setSkills] = useState([]);
   const [skillSearch, setSkillSearch] = useState("");
   const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState("");
+  const [error, setError] = useState(false);
 
   const filteredSkills = AVAILABLE_SKILLS.filter((skill) =>
     skill.includes(skillSearch.toLowerCase())
@@ -77,7 +79,11 @@ const EditProfile = () => {
       const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/profile`, {
         credentials: "include",
       });
-      if (!res.ok) throw new Error();
+      if (!res.ok) {
+        setError(true);
+        setMessage("Something went wrong");
+        throw new Error();
+      }
       const data = await res.json();
       setName(data.user.name || "");
       setBio(data.user.bio || "");
@@ -85,6 +91,8 @@ const EditProfile = () => {
       setImage(data.user.image || "image.png");
     } catch (err) {
       console.error(err);
+      setError(true);
+      setMessage(err);
     } finally {
       setLoading(false);
     }
@@ -130,20 +138,46 @@ const EditProfile = () => {
           body: formData,
         }
       );
-      if (!res.ok) throw new Error();
+      if (!res.ok) {
+        setError(true);
+        setMessage("Something Went Wrong for editing");
+        throw new Error();
+      }
       navigate("/profile");
-    } catch {
-      alert("Error while saving profile");
+    } catch (err) {
+      setError(true);
+      setMessage(err);
     } finally {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    setTimeout(() => {
+      setError(false);
+      setMessage("");
+    }, 5000);
+  }, []);
 
   return (
     <>
       {loading && (
         <div className="fixed inset-0 flex items-center justify-center bg-white/70 z-50">
           <img className="w-20 h-20" src="/Spinner.gif" alt="Loading" />
+        </div>
+      )}
+      {message && (
+        <div
+          className={`
+      fixed bottom-6 right-6 z-50
+      px-5 py-3 rounded-xl shadow-lg
+      text-white font-semibold text-sm
+      backdrop-blur-md 
+      animate-bounce
+      ${error ? "bg-red-500/80" : "bg-green-500/80"}
+    `}
+        >
+          {message}
         </div>
       )}
 

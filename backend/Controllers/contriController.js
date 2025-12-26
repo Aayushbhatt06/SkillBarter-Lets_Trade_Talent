@@ -121,7 +121,6 @@ const getMyProjectContributions = async (req, res) => {
   try {
     const userId = req.user._id;
 
-    // ✅ FIX: correct owner field
     const projects = await projectModel.find({ userId });
 
     if (!projects.length) {
@@ -145,7 +144,7 @@ const getMyProjectContributions = async (req, res) => {
     projects.forEach((proj) => {
       projectMap.set(proj._id.toString(), {
         _id: proj._id,
-        title: proj.name, // ✅ FIX: name field
+        title: proj.name,
         description: proj.description,
         contributors: [],
       });
@@ -154,7 +153,6 @@ const getMyProjectContributions = async (req, res) => {
     contributions.forEach((contri) => {
       const projId = contri.proj.toString();
 
-      // ✅ SAFETY CHECK
       if (!projectMap.has(projId)) return;
 
       projectMap.get(projId).contributors.push({
