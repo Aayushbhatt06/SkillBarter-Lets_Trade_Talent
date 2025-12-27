@@ -21,6 +21,7 @@ const Sidebar = () => {
   const [connections, setConnections] = useState([]);
   const [processedConn, setProcessedConn] = useState(connections);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [current, setCurrent] = useState("Home");
 
   const userId = useSelector((state) => state.user.id);
 
@@ -185,11 +186,16 @@ const Sidebar = () => {
           overflow-y-auto
         `}
       >
-        <nav className="bg-slate-50 space-y-2 mt-12 md:mt-0">
+        <nav className="bg-slate-50 rounded-lg space-y-2 mt-12 md:mt-0 p-2">
           <Link
             to="/"
-            onClick={closeMobileMenu}
-            className="flex items-center space-x-2 sm:space-x-3 px-3 py-2 sm:px-4 sm:py-3 text-sm sm:text-base text-blue-600 bg-slate-50 rounded-lg font-medium !no-underline"
+            onClick={() => {
+              setCurrent("Home");
+              closeMobileMenu();
+            }}
+            className={`flex items-center space-x-2 sm:space-x-3 px-3 py-2 sm:px-4 sm:py-3 text-sm sm:text-base ${
+              current === "Home" ? "text-blue-600" : "text-gray-700"
+            } hover:bg-gray-100 rounded-lg transition-colors duration-300 font-medium !no-underline`}
           >
             <Home size={18} className="sm:w-5 sm:h-5" />
             <span>Home</span>
@@ -197,8 +203,13 @@ const Sidebar = () => {
 
           <Link
             to="/profile"
-            onClick={closeMobileMenu}
-            className="flex items-center space-x-2 sm:space-x-3 px-3 py-2 sm:px-4 sm:py-3 text-sm sm:text-base text-gray-700 hover:bg-gray-100 rounded-lg !no-underline"
+            onClick={() => {
+              setCurrent("Profile");
+              closeMobileMenu();
+            }}
+            className={`flex items-center space-x-2 sm:space-x-3 px-3 py-2 sm:px-4 sm:py-3 text-sm sm:text-base ${
+              current === "Profile" ? "text-blue-600" : "text-gray-700"
+            } hover:bg-gray-100 rounded-lg transition-colors duration-300 !no-underline`}
           >
             <User size={18} className="sm:w-5 sm:h-5" />
             <span>Profile</span>
@@ -206,25 +217,37 @@ const Sidebar = () => {
 
           <Link
             to="/newproject"
-            onClick={closeMobileMenu}
-            className="flex items-center space-x-2 sm:space-x-3 px-3 py-2 sm:px-4 sm:py-3 text-sm sm:text-base text-gray-700 hover:bg-gray-100 rounded-lg !no-underline"
+            onClick={() => {
+              setCurrent("newproject");
+              closeMobileMenu();
+            }}
+            className={`flex items-center space-x-2 sm:space-x-3 px-3 py-2 sm:px-4 sm:py-3 text-sm sm:text-base ${
+              current === "newproject" ? "text-blue-600" : "text-gray-700"
+            } hover:bg-gray-100 rounded-lg transition-colors duration-300 !no-underline`}
           >
             <Proportions size={18} className="sm:w-5 sm:h-5" />
             <span>New Project</span>
           </Link>
+
           <Link
             to="/contribution"
-            onClick={closeMobileMenu}
-            className="flex items-center space-x-2 sm:space-x-3 px-3 py-2 sm:px-4 sm:py-3 text-sm sm:text-base text-gray-700 hover:bg-gray-100 rounded-lg !no-underline"
+            onClick={() => {
+              setCurrent("contributions");
+              closeMobileMenu();
+            }}
+            className={`flex items-center space-x-2 sm:space-x-3 px-3 py-2 sm:px-4 sm:py-3 text-sm sm:text-base ${
+              current === "contributions" ? "text-blue-600" : "text-gray-700"
+            } hover:bg-gray-100 rounded-lg transition-colors duration-300 !no-underline`}
           >
             <PieChart size={18} className="sm:w-5 sm:h-5" />
             <span>Contributions</span>
           </Link>
         </nav>
-        <div className="messages mt-4 p-3 sm:p-4 bg-white/70 border rounded-xl shadow-sm">
-          <div className="msg_heading flex items-center gap-2 sm:gap-3">
+
+        <div className="messages mt-4 p-3 sm:p-4 bg-slate-50 rounded-lg">
+          <div className="msg_heading flex items-center gap-2 sm:gap-3 mb-3">
             <MessageSquare className="text-blue-700 w-5 h-5 sm:w-6 sm:h-6" />
-            <h3 className="font-semibold text-sm sm:text-base !text-blue-700/80 mb-3">
+            <h3 className="font-semibold text-sm sm:text-base text-blue-700/80">
               Messages
             </h3>
           </div>
@@ -234,7 +257,7 @@ const Sidebar = () => {
             placeholder="Search connections..."
             value={SearchConn}
             onChange={(e) => setSearchConn(e.target.value)}
-            className="w-full px-3 py-2 text-xs sm:text-sm border rounded-lg outline-none focus:ring-2 focus:ring-blue-300 mb-3"
+            className="w-full px-3 py-2 text-xs sm:text-sm border border-gray-200 bg-white rounded-lg outline-none focus:ring-2 focus:ring-blue-300 mb-3"
           />
 
           <div className="space-y-2 max-h-[30vh] sm:max-h-[35vh] overflow-y-auto">
@@ -242,7 +265,7 @@ const Sidebar = () => {
               <div key={conn._id}>
                 <div
                   onClick={() => handleChatNavigation(conn.user, conn.user._id)}
-                  className="flex items-center gap-2 sm:gap-3 px-2 py-2 sm:px-3 rounded-lg hover:bg-gray-100 cursor-pointer"
+                  className="flex items-center gap-2 sm:gap-3 px-2 py-2 sm:px-3 rounded-lg hover:bg-gray-100 cursor-pointer transition-colors duration-200"
                 >
                   <img
                     src={conn.user.image || "image.png"}

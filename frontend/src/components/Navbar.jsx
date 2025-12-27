@@ -165,6 +165,10 @@ const Navbar = () => {
       method: "POST",
       credentials: "include",
     });
+    localStorage.removeItem("profileData");
+    localStorage.removeItem("ProjectsCache");
+    localStorage.removeItem("Posts");
+    localStorage.removeItem("connectionsData");
     dispatch(logout());
     window.location.reload();
   };
@@ -246,7 +250,7 @@ const Navbar = () => {
               onClick={() => navigate("/")}
               className="text-sm md:text-base cursor-pointer font-semibold text-white whitespace-nowrap"
             >
-              SkillBarter
+              SkillMate
             </h6>
             <h6 className="hidden lg:block text-sm md:text-base font-semibold text-white truncate">
               : {tagline}
@@ -278,9 +282,9 @@ const Navbar = () => {
             </button>
             <button
               onClick={handleLogout}
-              className="bg-red-700 hover:bg-red-800 transition px-4 py-2 rounded text-white text-sm font-medium"
+              className="flex gap-2 bg-red-700 hover:bg-red-800 transition px-4 py-2 rounded text-white text-sm font-medium"
             >
-              Logout
+              Logout <LogOut />
             </button>
           </div>
 
