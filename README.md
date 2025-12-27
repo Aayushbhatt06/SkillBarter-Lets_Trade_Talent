@@ -188,127 +188,113 @@ npm run dev
 
 ```
 SkillMate-Lets_Trade_Talent/
-│
-├── backend/
-│   ├── config/
-│   │   ├── db.js                    # MongoDB connection
-│   │   └── cloudinary.js            # Cloudinary configuration
-│   │
-│   ├── controllers/
-│   │   ├── authController.js        # Authentication logic
-│   │   ├── userController.js        # User CRUD operations
-│   │   ├── projectController.js     # Project management
-│   │   ├── messageController.js     # Chat functionality
-│   │   └── notificationController.js # Notifications
-│   │
-│   ├── models/
-│   │   ├── User.js                  # User schema
-│   │   ├── Project.js               # Project schema
-│   │   ├── Message.js               # Message schema
-│   │   ├── Notification.js          # Notification schema
-│   │   └── Collaboration.js         # Collaboration schema
-│   │
-│   ├── routes/
-│   │   ├── auth.js                  # Auth endpoints
-│   │   ├── users.js                 # User endpoints
-│   │   ├── projects.js              # Project endpoints
-│   │   ├── messages.js              # Message endpoints
-│   │   └── notifications.js         # Notification endpoints
-│   │
-│   ├── middleware/
-│   │   ├── auth.js                  # JWT verification
-│   │   ├── upload.js                # Multer configuration
-│   │   ├── validate.js              # Joi validation
-│   │   └── errorHandler.js          # Error handling
-│   │
-│   ├── utils/
-│   │   ├── recommendation.js        # Matching algorithm
-│   │   ├── validators.js            # Input validators
-│   │   ├── emailService.js          # SendGrid integration
-│   │   └── helpers.js               # Helper functions
-│   │
-│   ├── socket/
-│   │   └── socketHandler.js         # Socket.io logic
-│   │
-│   ├── .env                         # Environment variables
-│   ├── index.js                     # Entry point
-│   └── package.json                 # Dependencies
-│
-├── frontend/
-│   ├── public/
-│   │   └── index.html
-│   │
-│   ├── src/
-│   │   ├── components/
-│   │   │   ├── auth/
-│   │   │   │   ├── Login.jsx
-│   │   │   │   ├── Register.jsx
-│   │   │   │   └── ProtectedRoute.jsx
-│   │   │   │
-│   │   │   ├── profile/
-│   │   │   │   ├── ProfileCard.jsx
-│   │   │   │   ├── ProfileEdit.jsx
-│   │   │   │   └── SkillsSection.jsx
-│   │   │   │
-│   │   │   ├── projects/
-│   │   │   │   ├── ProjectCard.jsx
-│   │   │   │   ├── ProjectList.jsx
-│   │   │   │   ├── ProjectDetail.jsx
-│   │   │   │   └── CreateProject.jsx
-│   │   │   │
-│   │   │   ├── chat/
-│   │   │   │   ├── ChatWindow.jsx
-│   │   │   │   ├── MessageList.jsx
-│   │   │   │   ├── MessageInput.jsx
-│   │   │   │   └── ConversationList.jsx
-│   │   │   │
-│   │   │   ├── common/
-│   │   │   │   ├── Navbar.jsx
-│   │   │   │   ├── Footer.jsx
-│   │   │   │   ├── Loader.jsx
-│   │   │   │   └── ErrorBoundary.jsx
-│   │   │   │
-│   │   │   └── recommendations/
-│   │   │       ├── RecommendationCard.jsx
-│   │   │       └── RecommendationList.jsx
-│   │   │
-│   │   ├── pages/
-│   │   │   ├── Home.jsx
-│   │   │   ├── Dashboard.jsx
-│   │   │   ├── Profile.jsx
-│   │   │   ├── Projects.jsx
-│   │   │   ├── Messages.jsx
-│   │   │   ├── Recommendations.jsx
-│   │   │   └── NotFound.jsx
-│   │   │
-│   │   ├── store/
-│   │   │   ├── store.js
-│   │   │   │── userSlice.js
-│   │   │   └── index.js
-│   │   │
-│   │   │
-│   │   ├── utils/
-│   │   │   ├── base.js
-│   │   │   ├── socket.js
-│   │   │
-│   │   ├── styles/
-│   │   │   └── index.css             # Global styles
-│   │   │
-│   │   ├── App.jsx                   # Root component
-│   │   ├── main.jsx                  # Entry point
-│   │   └── vite-env.d.ts
-│   │
-│   ├── .env                          # Environment variables
-│   ├── package.json                  # Dependencies
-│   ├── vite.config.js                # Vite configuration
-│   ├── tailwind.config.js            # Tailwind configuration
-│   ├── eslint.config.js              # ESLint configuration
-│   └── index.html
-│
-├── DOCS/                             # Documentation
 ├── .gitignore
+├── DOCS/
+│   └── Home Layout.png
 ├── README.md
-└── LICENSE
+├── backend/
+│   ├── .gitignore
+│   ├── Controllers/
+│   │   ├── AuthController.js
+│   │   ├── ConnectionController.js
+│   │   ├── Posts.js
+│   │   ├── Socket/
+│   │   │   ├── ChatController.js
+│   │   │   └── socket.js
+│   │   ├── addProject.js
+│   │   ├── addSkill.js
+│   │   ├── check.js
+│   │   ├── contriController.js
+│   │   ├── editProfile.js
+│   │   ├── fetchProfile.js
+│   │   ├── fetchProject.js
+│   │   ├── projectSkills.js
+│   │   └── tagline.js
+│   ├── Middlewares/
+│   │   ├── AuthValidation.js
+│   │   ├── LoggedInOnly.js
+│   │   └── multer_upload.js
+│   ├── Models/
+│   │   ├── Comments.js
+│   │   ├── Connection.js
+│   │   ├── Like.js
+│   │   ├── PendingUser.js
+│   │   ├── Proj_Contri.js
+│   │   ├── User.js
+│   │   ├── db.js
+│   │   ├── messages.js
+│   │   ├── posts.js
+│   │   ├── projects.js
+│   │   └── tagline.js
+│   ├── Routes/
+│   │   ├── ApiRouter.js
+│   │   ├── AuthRouter.js
+│   │   ├── ContributionsRouter.js
+│   │   ├── chatRouter.js
+│   │   ├── connectionRoute.js
+│   │   └── profileRoutes.js
+│   ├── index.js
+│   ├── package-lock.json
+│   ├── package.json
+│   ├── temp_profiles/
+│   │   └── temp.txt
+│   └── utils/
+│       ├── SendGridMail.js
+│       └── cloudinary.js
+└── frontend/
+    ├── .gitignore
+    ├── README.md
+    ├── eslint.config.js
+    ├── index.html
+    ├── package-lock.json
+    ├── package.json
+    ├── public/
+    │   ├── Spinner.gif
+    │   ├── image.png
+    │   ├── project.png
+    │   └── vite.svg
+    ├── src/
+    │   ├── App.css
+    │   ├── App.jsx
+    │   ├── Redux/
+    │   │   ├── store.js
+    │   │   └── userSlice.js
+    │   ├── assets/
+    │   │   ├── SkillMate.png
+    │   │   └── react.svg
+    │   ├── components/
+    │   │   ├── CommentCard.jsx
+    │   │   ├── Contribution.jsx
+    │   │   ├── EditProfile.jsx
+    │   │   ├── Home.jsx
+    │   │   ├── InstantPost.jsx
+    │   │   ├── Login.jsx
+    │   │   ├── Message.jsx
+    │   │   ├── Navbar.jsx
+    │   │   ├── NewProject.jsx
+    │   │   ├── Notification.jsx
+    │   │   ├── Post.jsx
+    │   │   ├── PostCard.jsx
+    │   │   ├── PostFeed.jsx
+    │   │   ├── Profile.jsx
+    │   │   ├── Profile_Inspect.jsx
+    │   │   ├── ProjectCard.jsx
+    │   │   ├── ProjectFeed.jsx
+    │   │   ├── ProtectedRoute.jsx
+    │   │   ├── SendConnection.js
+    │   │   ├── Sidebar.jsx
+    │   │   └── Signup.jsx
+    │   ├── index.css
+    │   ├── main.jsx
+    │   └── sources/
+    │       └── svg/
+    │           └── hamburger.svg
+    ├── utils/
+    │   ├── Socket.js
+    │   └── base.js
+    ├── vercel.json
+    └── vite.config.js
+
 ```
 
 ## 🔧 Environment Variables
